@@ -1,0 +1,27 @@
+.layout-container {padding:0;border:1px solid #dcdcdc;}
+.left {background-color:#f5f5f5;text-align:center;padding:0;height:620px;}
+.right {padding:10px;overflow-y:scroll;height:620px;}
+.row {margin:0px;}
+.info {padding-top:30px;padding-bottom:15px;border-bottom:1px solid #c8c8c8;}
+.info .nav {width:100%;}
+.info .nav-item {width:27%;}
+.info .nav-item b {font-size:20px;}
+.info .nav-item + .nav-item {margin-left:1rem;padding-left:1rem;border-left:1px solid #dcdcdc;}
+.tab {display:block;width:100%;padding:0;}
+.tab a {color:#636470;}
+.tab li {height:40px;width:100%;line-height:40px;}
+.tab .active {background-color:white;border-left:5px solid #00BFFF;color:#00abff;}
+.dashboard {height:auto;overflow:hidden;}
+.dashboard ul li {width:24%;float:left;margin-left:1%;list-style:none;color:white;box-sizing:border-box;}
+.dashboard ul {margin-left:0;padding-left:0;}
+.dashboard ul li .icon {float:left;font-size:40px;margin:15px;line-height:1.5;}
+.dashboard ul li .number {float:right;margin:15px;font-size:30px;text-align:right;line-height:1.5;}
+.dashboard ul li .number span {display:block;font-size:12px;color:rgba(255,255,255,.85);}
+.dashboard .threads {background-color:#0bacd3;}
+.dashboard .praises {background-color:#ea4c89;}
+.dashboard .point {background-color:#ffb848;}
+.dashboard .comments {background-color:#00c3b6;}
+.dashboard ul li .more {clear:both;}
+.dashboard ul li .more a {display:block;color:rgba(255,255,255,.85);background-color:rgba(0,0,0,.15);padding:5px 15px;}
+.dashboard ul li .more a i {margin-left:35%;}
+.dashboard ul li .more a:hover {background-color:rgba(0,0,0,.25);}

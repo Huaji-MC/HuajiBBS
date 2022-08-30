@@ -1,0 +1,31 @@
+<{include file = '../include/user_header.html'}>
+
+<ul class="list-group list-group-flush">
+	<{foreach from = $praises item = $praise key = $key}>
+	<li class="list-group-item">
+		<div class="media pt-3">
+			<a href="<{url('user','index',$user.uid)}>"><img src="<{$user.avatar}>" class="mr-3 rounded-circle" style="width:50px;"></a>
+			<div class="media-body">
+				<h6 color="<{$user.group.font_color}>">
+					<{$user.username}>
+				</h6>
+				<p>
+					<span class="badge text-white" bgcolor="<{$user.group.color}>">
+						<{$user.group.name}>
+					</span>
+					<span class="float-right text-muted"><{timeFormat($praise.time)}></span>
+				</p>
+				
+				<p class="content">点赞了主题 《<a href="<{url('thread','index',$praise.tid,0,0,1)}>"><{$praise.thread.title}></a>》</p>
+			</div>
+		</div>
+	</li>
+	<{foreachelse}>
+	<p class="text-center text-muted mt-5 mb-5">空空如也～</p>
+	<{/foreach}>
+</ul>
+<div class="pt-3">
+	<{pagination($count,30,$p_1,url('user','praises',$p_0,'{{page}}'))}>
+</div>
+
+<{include file = '../include/user_footer.html'}>

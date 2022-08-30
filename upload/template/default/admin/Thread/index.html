@@ -1,0 +1,348 @@
+<{include file="../include/header.html"}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header">搜索主题</div>
+		<div class="layui-form layuiadmin-card-header-auto">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">主题ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="tid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">作者ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="uid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">版块ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="fid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">标题（模糊搜索）</label>
+					<div class="layui-input-block">
+						<input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">内容（模糊搜索）</label>
+					<div class="layui-input-block">
+						<input type="text" name="content" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">图片</label>
+					<div class="layui-input-block">
+						<input type="radio" name="image" value="0" title="全部" checked>
+						<input type="radio" name="image" value="1" title="无图">
+						<input type="radio" name="image" value="2" title="有图">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">置顶状态</label>
+					<div class="layui-input-block">
+						<input type="radio" name="top" value="0" title="全部" checked>
+						<input type="radio" name="top" value="1" title="未置顶">
+						<input type="radio" name="top" value="2" title="版块置顶">
+						<input type="radio" name="top" value="3" title="全站置顶">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">精华状态</label>
+					<div class="layui-input-block">
+						<input type="radio" name="essence" value="0" title="全部" checked>
+						<input type="radio" name="essence" value="1" title="未精华">
+						<input type="radio" name="essence" value="2" title="精华">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">锁定状态</label>
+					<div class="layui-input-block">
+						<input type="radio" name="lock" value="0" title="全部" checked>
+						<input type="radio" name="lock" value="1" title="未锁定">
+						<input type="radio" name="lock" value="2" title="锁定">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发表时间开始</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="start" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发表时间结束</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="end" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<button class="layui-btn" lay-submit lay-filter="search">
+						<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card-body">
+			<script type="text/html" id="topBar">
+				<button class="layui-btn layui-btn-sm" lay-event="lock">批量锁定</button>
+				<button class="layui-btn layui-btn-sm" lay-event="unlock">批量取消锁定</button>
+				<button class="layui-btn layui-btn-sm" lay-event="delete">批量删除</button>
+			</script>
+			<table id="list" lay-filter="list"></table> 
+			<script type="text/html" id="rightBar">
+				<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="go"><i class="layui-icon layui-icon-release"></i>跳转</a>
+			</script>
+			<script id="images" type="text/html">
+				{{# if(d.images.length) { }}
+				<button class="layui-btn layui-btn-xs layui-btn-primary" onclick="javascript:showImages('{{JSON.stringify(d)}}')">点击查看</button>
+				{{# } else { }}
+				无图片
+				{{# } }}
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form', 'table','laydate','laytpl','upload'], function(){
+	var $ = layui.$
+	,form = layui.form
+	,table = layui.table
+	,laydate = layui.laydate
+	,laytpl = layui.laytpl
+	,upload = layui.upload;
+	
+	laydate.render({
+		elem: "input[name='start']"
+	});
+	laydate.render({
+		elem: "input[name='end']"
+	});
+	
+	table.render({
+		elem: '#list'
+		,height: 400
+		,url: '<{url('thread','search_ajax')}>'
+		,toolbar: '#topBar'
+		,page: true
+		,method: 'post'
+		,parseData: function(res) {
+			return {
+				"code": res.status,
+				"count": res.count,
+				"data": res.data
+			};
+		}
+		,response: {
+			statusCode: 1
+		}
+		
+		,cols: [[
+			{type: 'checkbox', fixed: 'left'}
+			,{field: 'tid', title: 'TID', width:80, sort: true}
+			,{field: 'uid', title: '作者', width:180,templet:'<div><img height="28px" src="{{d.user.avatar}}"> [UID:{{d.uid}}]{{d.user.username}}</div>'}
+			,{field: 'fid', title: '版块', width:180,templet:'<div><img height="28px" src="{{d.forum.icon}}"> [FID:{{d.fid}}]{{d.forum.name}}</div>'}
+			,{field: 'title', title: '标题', width:200}
+			,{field: 'content', title: '内容', width:400}
+			,{field: 'views', title: '浏览', width:80, sort: true}
+			,{field: 'comments', title: '评论', width:80, sort: true}
+			,{field: 'praises', title: '点赞', width:80, sort: true}
+			,{field: 'points', title: '积分', width:80, sort: true}
+			,{field: 'images', title: '图片', width:100, templet: $('#images')}
+			,{field: 'top', title: '置顶状态', width:100, templet: '<div>{{d.top == 0 ? "未置顶" : (d.top == 1 ? "版块置顶" : (d.top == 2 ? "全站置顶" : "未知"))}}</div>'}
+			,{field: 'essence', title: '精华状态', width:100, templet: '<div>{{d.essence == 0 ? "未精华" : (d.essence == 1 ? "精华": "未知")}}</div>'}
+			,{field: 'lock', title: '锁定状态', width:100, templet: '<div>{{d.lock == 0 ? "未锁定" : (d.lock == 1 ? "锁定": "未知")}}</div>'}
+			,{field: 'edit_time', title: '最后编辑时间', width:200,sort:true,templet:'<div>{{d.edit_time == 0 ? "未被编辑" : HuajiBBS.timestamp2date(d.edit_time)}}</div>'}
+			,{field: 'last_time', title: '最后回复时间', width:200,sort:true,templet:'<div>{{HuajiBBS.timestamp2date(d.last_time)}}</div>'}
+			,{field: 'time', title: '发表时间', width:200,sort:true,templet:'<div>{{HuajiBBS.timestamp2date(d.time)}}</div>'}
+			,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:90}
+		]]
+	});
+	
+	form.on('submit(search)', function(data){
+		var field = data.field;
+		
+		table.reload('list', {
+			where: field
+		});
+	});
+	
+	
+	table.on('toolbar(list)', function(obj){
+		var checkStatus = table.checkStatus(obj.config.id);
+		var data = checkStatus.data;
+		switch(obj.event){
+			case 'delete':
+				if(data.length == 0) {
+					layer.msg('请选择主题');
+					break;
+				}
+				layer.alert('确定要删除吗？请谨慎操作',{
+					icon: 0,
+					title: '你正在删除 '+data.length+' 个主题',
+					yes: function(index) {
+						$.each(data,function(index,value) {
+							$.get("<{url('thread','delete_ajax','"+value.tid+"')}>",function(data) {
+								if(data.status) {
+									layer.msg('删除成功：'+value.tid,{icon:6});
+									table.reload('list');
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">删除失败（'+value.tid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				break;
+			case 'lock':
+				if(data.length == 0) {
+					layer.msg('请选择主题');
+					break;
+				}
+				layer.alert('确定要锁定吗？请谨慎操作',{
+					icon: 0,
+					title: '你正在锁定 '+data.length+' 个主题',
+					yes: function(index) {
+						$.each(data,function(index,value) {
+							$.get("<{url('thread','lock_ajax','"+value.tid+"')}>",function(data) {
+								if(data.status) {
+									layer.msg('锁定成功：'+value.tid,{icon:6});
+									table.reload('list');
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">锁定失败（'+value.tid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				break;
+			case 'unlock':
+				if(data.length == 0) {
+					layer.msg('请选择主题');
+					break;
+				}
+				layer.alert('确定要取消锁定吗？请谨慎操作',{
+					icon: 0,
+					title: '你正在取消锁定 '+data.length+' 个主题',
+					yes: function(index) {
+						$.each(data,function(index,value) {
+							$.get("<{url('thread','unlock_ajax','"+value.tid+"')}>",function(data) {
+								if(data.status) {
+									layer.msg('取消锁定成功：'+value.tid,{icon:6});
+									table.reload('list');
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">取消锁定失败（'+value.tid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				break;
+		};
+	});
+
+	table.on('tool(list)', function(obj) {
+		var data = obj.data;
+		var event = obj.event;
+		var tr = obj.tr;
+		
+		if(event == 'go') {
+			location.href = "<{homeUrl('thread','index','"+data.tid+"',0,0,1)}>";
+		}
+	});
+});
+
+function showImages(d) {
+	d = JSON.parse(d);
+	var json = {
+		title: '图片',
+		id: d.tid,
+		data: function() {
+			var data = [];
+			$.each(d.images,function(index,value) {
+				data.push({
+					alt: index + 1,
+					pid: index + 1,
+					src: '<{URL}>' + value,
+					thumb: '<{URL}>' + value
+				});
+			});
+			return data;
+		}()
+	};
+	layer.photos({
+		photos: json
+	});
+}
+</script>
+
+<{include file="../include/footer.html"}>

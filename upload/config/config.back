@@ -1,0 +1,47 @@
+<?php
+// +----------------------------------------------------------------------
+// | HuajiBBS
+// +----------------------------------------------------------------------
+// | Copyright © 2022 HuajiMC. All rights reserved.
+// +----------------------------------------------------------------------
+// | License: GNU General Public License 3.0
+// +----------------------------------------------------------------------
+// | Author: 滑稽mc（HuajiMC） <HuajiMC@126.com>
+// +----------------------------------------------------------------------
+
+//请不要随意修改配置文件，否则后果自负
+
+return [
+	//站点配置
+	"site_name" => "HuajiBBS",
+	"site_logo" => "static/images/logo.png",
+	"title_end_content" => " - Powered By HuajiMC",
+	
+	//社区配置
+	"default_avatar" => "static/images/avatar.png",
+	"default_forum_icon" => "static/images/forum.png",
+	"open_register" => "1",
+	"login_email_code" => "0",
+	"register_email_code" => "0",
+	"email_code_title" => "HuajiBBS 邮箱验证码",
+	"email_code_content" => "<h1><center>HuajiBBS邮箱验证码</center></h1>\n<hr>\n<p>尊敬的 {username}，<br>\n你正在进行 {action} 操作，你的验证码为\n<center><a href=\"#\" style=\"text-decoration:none\"><h1 style=\"color:red\">{code}</h1></a></center>\n<b>* 验证码有效期 <b>10</b> 分钟，过期后请重新获取</b></p>\n<hr>\n<center style=\"color:gray\">请不要将验证码告诉他人，否则后果自负</center>",
+	"point_name" => "积分",
+	"create_thread_frequency" => "0",
+	"current_template" => "default",
+	
+	//SMTP配置
+	"smtp_host" => "",
+	"smtp_username" => "",
+	"smtp_password" => "",
+	"smtp_port" => "",
+	"smtp_email" => "",
+	"smtp_name" => "",
+	
+	//数据库配置（mysql）
+	"mysql_host" => "localhost",
+	"mysql_username" => "",
+	"mysql_password" => "",
+	"mysql_dbname" => "",
+	"mysql_port" => "3306",
+	"mysql_charset" => "utf8",
+];

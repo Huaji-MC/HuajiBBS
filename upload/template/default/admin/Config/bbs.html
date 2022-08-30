@@ -1,0 +1,144 @@
+<{include file='../include/header.html'}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			<form class="layui-form layui-form-pane" action="">
+				<div class="layui-form-item">
+					<label class="layui-form-label">默认头像</label>
+					<label class="layui-form-label" style="width:auto"><{URL}></label>
+					<div class="layui-input-inline">
+						<input type="text" id="avatar" name="avatar" value="<{C('default_avatar')}>" required lay-verify="required" placeholder="请输入站点logo图片路径" autocomplete="off" class="layui-input">
+					</div>
+					<button type="button" class="layui-btn" id="upload-avatar"><i class="layui-icon">&#xe67c;</i> 上传</button>
+					<button type="button" class="layui-btn layui-btn-primary" id="show-avatar">预览</button>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">默认版块图标</label>
+					<label class="layui-form-label" style="width:auto"><{URL}></label>
+					<div class="layui-input-inline">
+						<input type="text" id="icon" name="icon" value="<{C('default_forum_icon')}>" required lay-verify="required" placeholder="请输入版块默认图标图片路径" autocomplete="off" class="layui-input">
+					</div>
+					<button type="button" class="layui-btn" id="upload-icon"><i class="layui-icon">&#xe67c;</i> 上传</button>
+					<button type="button" class="layui-btn layui-btn-primary" id="show-icon">预览</button>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">是否开放注册</label>
+					<div class="layui-input-block">
+						<input type="checkbox" name="open_register" lay-skin="switch" lay-text="开启|关闭" <{if C('open_register')}>checked<{/if}>>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">登录邮箱验证</label>
+					<div class="layui-input-block">
+						<input type="checkbox" name="login_email_code" lay-skin="switch" lay-text="开启|关闭" <{if C('login_email_code')}>checked<{/if}>>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">注册邮箱验证</label>
+					<div class="layui-input-block">
+						<input type="checkbox" name="register_email_code" lay-skin="switch" lay-text="开启|关闭" <{if C('register_email_code')}>checked<{/if}>>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">验证邮件标题</label>
+					<div class="layui-input-block">
+						<input type="text" name="email_code_title" value="<{C('email_code_title')}>" required lay-verify="required" placeholder="请输入邮箱验证码标题" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">验证邮件内容</label>
+					<div class="layui-input-block">
+						<textarea name="email_code_content" required lay-verify="required" placeholder="请输入邮箱验证码内容" autocomplete="off" class="layui-textarea" rows="10"><{C('email_code_content')}></textarea>
+					</div>
+					<div class="layui-form-mid layui-word-aux">可用变量：{code} - 验证码；{username} - 用户名；{action} - 当前操作</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">积分名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="point_name" value="<{C('point_name')}>" required lay-verify="required" placeholder="请输入积分名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">主题发布频率</label>
+					<div class="layui-input-block">
+						<input type="number" name="create_thread_frequency" value="<{C('create_thread_frequency')}>" required lay-verify="required" placeholder="请输入主题发布频率，单位：秒（s）" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['upload','form'], function(){
+	var upload = layui.upload,
+		form = layui.form;
+	
+	var uploadAvatar = upload.render({
+		elem: '#upload-avatar'
+		,url: '<{url('index','upload_ajax','user')}>'
+		,done: function(data){
+			if(data.status) {
+				$('#avatar').val(data.path);
+				layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+			} else {
+				layer.alert(data.msg,{icon:5});
+			}
+		}
+		,error: function(){
+			layer.alert('上传失败！',{icon:5});
+		}
+		,exts: 'gif|png|jpg|jpeg|webp'
+		,size: 1024
+	});
+	
+	$('#show-avatar').click(function() {
+		var path = $('#avatar').val();
+		layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+	});
+	
+	
+	var uploadIcon = upload.render({
+		elem: '#upload-icon'
+		,url: '<{url('index','upload_ajax','forum')}>'
+		,done: function(data){
+			if(data.status) {
+				$('#icon').val(data.path);
+				layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+			} else {
+				layer.alert(data.msg,{icon:5});
+			}
+		}
+		,error: function(){
+			layer.alert('上传失败！',{icon:5});
+		}
+		,exts: 'gif|png|jpg|jpeg|webp'
+		,size: 1024
+	});
+	
+	$('#show-icon').click(function() {
+		var path = $('#icon').val();
+		layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+	});
+	
+	form.on('submit(submit)',function(data) {
+		$.post('<{url('config','bbs_ajax')}>',data.field,function(data) {
+			if(data.status) {
+				layer.alert(data.msg,{icon:6});
+				location.reload();
+			} else {
+				layer.alert(data.msg,{icon:5});
+			}
+		});
+		return false;
+	});
+});
+</script>
+
+<{include file='../include/footer.html'}>

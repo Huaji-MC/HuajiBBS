@@ -1,0 +1,61 @@
+		<{if $friendshiplinks}>
+		<div class="card mt-3">
+			<div class="card-header">友情链接</div>
+			<div class="card-body">
+				<{foreach from = $friendshiplinks item = $link}>
+				<a href="<{$link.url}>" class="mr-3"><{$link.name}></a>
+				<{/foreach}>
+			</div>
+		</div>
+		<{/if}>
+		
+		<div class="layout-footer">
+			Copyright &copy; 2021-<{date('Y')}> HuajiMC. All Rights Reserved.<br>
+			HuajiBBS 官网：<a href="http://huajimc.gitee.io/HuajiBBS">http://huajimc.gitee.io/HuajiBBS</a>
+		</div>
+	</div>
+	
+	<script>
+	HuajiBBS.color();
+	HuajiBBS.bgcolor();
+	
+	function notice() {
+		$.get('<{url('index','unread_ajax')}>',function(data) {
+			if(data.msg == '1') {
+				$('.msg-notice').show();
+				var title = $('title').text();
+				var t = true;
+				var si = setInterval(function() {
+					if(t) {
+						$('title').prepend('【新消息】');
+						t = false;
+					} else {
+						$('title').text(title);
+						t = true;
+					}
+				},500);
+				setTimeout(function() {
+					$('title').text(title);
+					clearInterval(si);
+				},5*60*1000 - 5*1000);
+			} else {
+				$('.msg-notice').hide();
+			}
+		});
+	}
+	notice();
+	setInterval(function() {
+		notice();
+	},5*60*1000);
+	
+	$(function() {
+		$('.content').each(function() {
+			$(this).html(marked.parse($(this).text()));
+			$(this).find('pre code').each(function() {
+				$(this).html($(this).html().replace(new RegExp("\\\\&","gm"),'&'));
+			});
+		});
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>管理员登录 - Powered by HuajiBBS</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="<{URL}>static/lib/layui/css/layui.css" media="all">
+	<link rel="stylesheet" href="<{URL}>static/lib/layui/admin/admin.css" media="all">
+	<link rel="stylesheet" href="<{URL}>static/lib/layui/admin/login.css" media="all">
+	<script src="<{URL}>static/js/jquery.min.js"></script>
+	<script src="<{URL}>static/lib/layui/layui.js"></script>
+</head>
+<body>
+	<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+		<div class="layadmin-user-login-main">
+			<div class="layadmin-user-login-box layadmin-user-login-header">
+				<h2>管理员登录</h2>
+				<p> </p>
+			</div>
+			<div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+				<div class="layui-form-item">
+					<label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+					<input type="text" name="account" id="account" lay-verify="required" placeholder="用户名/邮箱" class="layui-input">
+				</div>
+				<div class="layui-form-item">
+					<label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+					<input type="password" name="password" id="password" lay-verify="required" placeholder="密码" class="layui-input">
+				</div>
+				<div class="layui-form-item">
+					<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login">登 录</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-trans layadmin-user-login-footer">
+			<p>Copyright © 2021 HuajiMC. All Rights Reserved. Powered by HuajiBBS.</p>
+		</div>
+	</div>
+
+	<script>
+	layui.use('form', function(){
+		var form = layui.form;
+		
+		form.on('submit(login)', function(data){
+			var account = data.field.account;
+			var password = data.field.password;
+			$.post("<{url('admin','login_ajax')}>",{account,password},function(data) {
+				if(data.status) {
+					layer.msg(data.msg,{icon:6});
+					window.location.href = "<{url('index','index')}>";
+				} else {
+					layer.msg(data.msg,{icon:5});
+				}
+			});
+			return false;
+		});
+	});
+	</script>
+</body>
+</html>

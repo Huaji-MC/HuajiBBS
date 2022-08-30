@@ -1,0 +1,349 @@
+<{include file="../include/header.html"}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header">搜索版块</div>
+		<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">版块ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="fid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">版块名称（模糊搜索）</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<button class="layui-btn" lay-submit lay-filter="search">
+						<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card-body">
+			<script type="text/html" id="topBar">
+				<button class="layui-btn layui-btn-sm" lay-event="create">添加版块</button>
+				<button class="layui-btn layui-btn-sm" lay-event="merge">合并版块</button>
+			</script>
+			<table id="list" lay-filter="list"></table> 
+			<script type="text/html" id="rightBar">
+				<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+				<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="moderator"><i class="layui-icon layui-icon-user"></i>版主</a>
+			</script>
+			<script type="text/html" id="edit">
+				<form class="layui-form layui-form-pane" style="padding:15px">
+					<div class="layui-form-item">
+						<label class="layui-form-label">版块名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="name" value="{{d.name}}" placeholder="请输入版块名称，最多 15 字符" maxlength="15" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">图标</label>
+						<label class="layui-form-label" style="width:auto"><{URL}></label>
+						<div class="layui-input-inline">
+							<input type="text" id="icon" name="icon" value="{{d.icon1}}" placeholder="请输入图标路径，留空则使用默认图标" autocomplete="off" class="layui-input">
+						</div>
+						<button type="button" class="layui-btn" id="upload-icon"><i class="layui-icon">&#xe67c;</i> 上传</button>
+						<button type="button" class="layui-btn layui-btn-primary" id="show-icon">预览</button>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">描述</label>
+						<div class="layui-input-block">
+							<textarea name="description" placeholder="请输入描述，最多 100 字符" maxlength="100" required lay-verify="required" autocomplete="off" class="layui-textarea">{{d.description}}</textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">规则</label>
+						<div class="layui-input-block">
+							<textarea name="rule" placeholder="请输入版块规则" required lay-verify="required" rows="10" autocomplete="off" class="layui-textarea">{{d.rule}}</textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="edit">立即提交</button>
+						</div>
+					</div>
+				</form>
+			</script>
+			<script type="text/html" id="merge">
+				<form class="layui-form" style="padding:15px">
+					<div class="layui-form-item">你正在合并 {{d.length}} 个版块，被合并的版块会被删除，版块中的内容会被移动到合并到的版块内</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">合并到</label>
+						<div class="layui-input-block">
+							<select name="fid">
+								{{# $.each(d,function(index,value) { }}
+								<option value="{{value.fid}}">{{value.name}}</option>
+								{{# }); }}
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button class="layui-btn" lay-submit lay-filter="merge">立即提交</button>
+						</div>
+					</div>
+					<div class="layui-form-item">版块合并后无法恢复，请谨慎操作！</div>
+				</form>
+			</script>
+			<script type="text/html" id="moderator">
+				<form class="layui-form" style="padding:15px" id="moderator-form">
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<input type="text" name="uid" placeholder="请输入新增版主UID" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+						<button class="layui-btn" lay-submit lay-filter="add"><i class="layui-icon layui-icon-add-1"></i></button>
+					</div>
+					{{# $.each(d.moderators,function(index,value) { }}
+					<div class="layui-form-item layui-bg-gray" id="moderator-{{index}}" style="padding:10px">
+						<img src="{{value.avatar}}" width="25px" height="25px">
+						{{value.username}}
+						（UID：{{value.uid}}）
+						<button class="layui-btn layui-btn-primary layui-btn-xs moderator-delete" style="float:right" type="button" data-index="{{index}}" data-uid="{{value.uid}}"><i class="layui-icon layui-icon-close"></i></button>
+					</div>
+					{{# }); }}
+				</form>
+			</script>
+			<script type="text/html" id="moderator-user">
+				<div class="layui-form-item layui-bg-gray" id="moderator-{{d.index}}" style="padding:10px">
+					<img src="{{d.user.avatar}}" width="25px" height="25px">
+					{{d.user.username}}
+					（UID：{{d.user.uid}}）
+					<button class="layui-btn layui-btn-primary layui-btn-xs moderator-delete" style="float:right" type="button" data-index="{{d.index}}" data-uid="{{d.user.uid}}"><i class="layui-icon layui-icon-close"></i></button>
+				</div>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form', 'table','laytpl','upload'], function(){
+	var $ = layui.$
+	,form = layui.form
+	,table = layui.table
+	,upload = layui.upload
+	,laytpl = layui.laytpl;
+	
+	table.render({
+		elem: '#list'
+		,height: 400
+		,url: '<{url('forum','search_ajax')}>'
+		,toolbar: '#topBar'
+		,page: true
+		,method: 'post'
+		,parseData: function(res) {
+			return {
+				"code": res.status,
+				"count": res.count,
+				"data": res.data
+			};
+		}
+		,response: {
+			statusCode: 1
+		}
+		
+		,cols: [[
+			{type: 'checkbox', fixed: 'left'}
+			,{field: 'fid', title: 'FID', width:80, sort: true}
+			,{field: 'icon', title: '图标', width:60,templet:'<div><img height="28px" src="{{d.icon}}"></div>'}
+			,{field: 'name', title: '版块名', width:150}
+			,{field: 'hot', title: '热度', width:80, sort: true}
+			,{field: 'threads', title: '主题', width:80, sort: true}
+			,{field: 'description', title: '描述', width:250}
+			,{field: 'rule', title: '规则', width:250}
+			,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:150}
+		]]
+	});
+	
+	form.on('submit(search)', function(data){
+		var field = data.field;
+		
+		table.reload('list', {
+			where: field
+		});
+	});
+	
+	table.on('toolbar(list)', function(obj){
+		var checkStatus = table.checkStatus(obj.config.id);
+		var data = checkStatus.data;
+		switch(obj.event){
+			case 'create':
+				var html = $('#edit').html();
+				laytpl(html).render({}, function(html) {
+					var index = layer.open({
+						type: 1,
+						area: ['100%','100%'],
+						content: html
+					});
+					var uploadIcon = upload.render({
+						elem: '#upload-icon'
+						,url: '<{url('index','upload_ajax','forum')}>'
+						,done: function(data){
+							if(data.status) {
+								$('#icon').val(data.path);
+								layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+							} else {
+								layer.alert(data.msg,{icon:5});
+							}
+						}
+						,error: function(){
+							layer.alert('上传失败！',{icon:5});
+						}
+						,exts: 'gif|png|jpg|jpeg|webp'
+						,size: 1024
+					});
+					
+					$(document).on('click','#show-icon',function() {
+						var path = $('#icon').val();
+						layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+					});
+					
+					form.on('submit(edit)',function(data) {
+						$.post('<{url('forum','edit_or_create_ajax','create')}>',data.field,function(data) {
+							if(data.status) {
+								layer.msg('添加成功',{icon:6});
+								table.reload('list');
+								layer.close(index);
+							} else {
+								layer.alert(data.msg,{icon:5});
+							}
+						});
+						
+						return false;
+					});
+				});
+				break;
+			case 'merge':
+				if(data.length < 2) {
+					layer.msg('请选择至少 2 个版块');
+					break;
+				}
+				var getTpl = $('#merge').html();
+				laytpl(getTpl).render(data, function(html) {
+					var index = layer.open({
+						type: 1,
+						title:'合并版块',
+						area: ['350px','290px'],
+						content: html
+					});
+					form.render('select');
+					form.on('submit(merge)',function(form) {
+						var from = '';
+						$.each(data,function(index,value) {
+							from += value.fid + ',';
+						});
+						$.post('<{url('forum','merge_ajax')}>',{from,to:form.field.fid},function(data) {
+							if(data.status) {
+								layer.msg(data.msg,{icon:6});
+								table.reload('list');
+								layer.close(index);
+							} else {
+								layer.msg(data.msg,{icon:5});
+							}
+						});
+						return false;
+					});
+				});
+				break;
+		};
+	});
+
+	table.on('tool(list)', function(obj) {
+		var data = obj.data;
+		var event = obj.event;
+		var tr = obj.tr;
+		
+		if(event == 'edit') {
+			var getTpl = $('#edit').html();
+			laytpl(getTpl).render(data, function(html) {
+				var index = layer.open({
+					type: 1,
+					area: ['100%','100%'],
+					content: html
+				});
+				var uploadIcon = upload.render({
+					elem: '#upload-icon'
+					,url: '<{url('index','upload_ajax','forum')}>'
+					,done: function(data){
+						if(data.status) {
+							$('#icon').val(data.path);
+							layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					}
+					,error: function(){
+						layer.alert('上传失败！',{icon:5});
+					}
+					,exts: 'gif|png|jpg|jpeg|webp'
+					,size: 1024
+				});
+				
+				$(document).on('click','#show-icon',function() {
+					var path = $('#icon').val();
+					layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+				});
+				
+				form.on('submit(edit)',function(form) {
+					$.post('<{url('forum','edit_or_create_ajax','edit')}>',Object.assign({fid:data.fid},form.field),function(data) {
+						if(data.status) {
+							layer.msg(data.msg,{icon:6});
+							table.reload('list');
+							layer.close(index);
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					return false;
+				});
+			});
+		} else if(event == 'moderator') {
+			var getTpl = $('#moderator').html();
+			laytpl(getTpl).render(data, function(html) {
+				var index = layer.open({
+					type: 1,
+					content: html
+				});
+				$('#moderator-form').on('click','.moderator-delete',function() {
+					var index = $(this).data('index');
+					var uid = $(this).data('uid');
+					$.post('<{url('forum','delete_moderator_ajax')}>',{fid:data.fid,uid},function(data) {
+						if(data.status) {
+							$('#moderator-'+index).addClass('layui-anim');
+							$('#moderator-'+index).addClass('layui-anim-fadeout');
+							setTimeout(function() {
+								$('#moderator-'+index).hide();
+							},350);
+							table.reload('list');
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+				});
+				form.on('submit(add)',function(form) {
+					$.post('<{url('forum','add_moderator_ajax')}>',{fid:data.fid,uid:form.field.uid},function(data) {
+						if(data.status) {
+							table.reload('list');
+							var getTpl = $('#moderator-user').html();
+							laytpl(getTpl).render({user:data.user,index:Date.now()}, function(html) {
+								$('#moderator-form').append(html);
+							});
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					return false;
+				});
+			});
+		}
+	});
+});
+</script>
+
+<{include file="../include/footer.html"}>

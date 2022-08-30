@@ -1,0 +1,71 @@
+<{include file='../include/header.html'}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			<form class="layui-form layui-form-pane" action="">
+				<div class="layui-form-item">
+					<label class="layui-form-label">SMTP服务器</label>
+					<div class="layui-input-block">
+						<input type="text" name="host" value="<{C('smtp_host')}>" required lay-verify="required" placeholder="请输入SMTP服务器" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">SMTP端口</label>
+					<div class="layui-input-block">
+						<input type="text" name="port" value="<{C('smtp_port')}>" required lay-verify="required" placeholder="请输入SMTP服务器端口" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">SMTP用户名</label>
+					<div class="layui-input-block">
+						<input type="text" name="username" value="<{C('smtp_username')}>" required lay-verify="required" placeholder="请输入SMTP用户名" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">SMTP密码</label>
+					<div class="layui-input-block">
+						<input type="text" name="password" value="<{C('smtp_password')}>" required lay-verify="required" placeholder="请输入SMTP密码" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">邮箱地址</label>
+					<div class="layui-input-block">
+						<input type="text" name="email" value="<{C('smtp_email')}>" required lay-verify="required" placeholder="请输入SMTP邮箱地址" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">发件人名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" value="<{C('smtp_name')}>" required lay-verify="required" placeholder="请输入发件人名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-inline">
+						<button class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+					</div>
+					<div class="layui-form-mid layui-word-aux">必须先配置SMTP才能使用邮箱验证码</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form'], function(){
+	var form = layui.form;
+	form.on('submit(submit)',function(data) {
+		$.post('<{url('config','smtp_ajax')}>',data.field,function(data) {
+			if(data.status) {
+				layer.alert(data.msg,{icon:6});
+				location.reload();
+			} else {
+				layer.alert(data.msg,{icon:5});
+			}
+		});
+		return false;
+	});
+});
+</script>
+
+<{include file='../include/footer.html'}>

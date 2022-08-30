@@ -1,0 +1,104 @@
+<{include file = "../include/header.html"}>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item"><a href="<{url('user','login')}>">登录</a></li>
+		<li class="breadcrumb-item active">找回密码</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="card">
+		<div class="card-header">找回密码</div>
+		<{if C('smtp_username')}>
+		<form class="card-body first">
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">账　号</span>
+				</div>
+				<input type="text" class="form-control" name="account" placeholder="请输入你的用户名或邮箱"  required>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">验证码</span>
+				</div>
+				<input type="number" class="form-control" name="code" placeholder="请输入邮箱验证码（发送至当前账号所绑定邮箱）"  required>
+				<div class="input-group-append">
+					<button class="btn btn-success" id="send" type="button">发送验证码</button>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary btn-block">继续</button>
+		</form>
+		
+		<form class="d-none second card-body">
+			<p class="text-muted">邮箱验证通过，请设置你的新密码～</p>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">新密码</span>
+				</div>
+				<input type="password" class="form-control" name="password" placeholder="请输入新密码"  required>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">重复密码</span>
+				</div>
+				<input type="password" class="form-control" name="repassword" placeholder="请再次输入密码"  required>
+			</div>
+			<button type="submit" class="btn btn-primary btn-block">确定</button>
+		</form>
+		<{else}>
+		管理员没有开启邮件发送，因此找回密码功能无法使用。
+		<{/if}>
+	</div>
+</div>
+
+<script>
+$('#send').click(function() {
+	var account = $('[name="account"]').val();
+	if(! account) {
+		HuajiBBS.tips('请输入账号！','warning');
+		$('[name="account"]').focus();
+		return;
+	}
+	
+	HuajiBBS.request('<{url('user','email_code_ajax','forget')}>',{account},{
+		success: function(data) {
+			HuajiBBS.tips(data.msg,'success');
+			
+			$('#send').attr('disabled','disabled').html('<span id="send-wait">120</span> 秒后重新发送');
+			setInterval(function() {
+				var wait = parseInt($('#send-wait').text());
+				$('#send-wait').text(-- wait);
+				if(wait == 0) {
+					$('#send').removeAttr('disabled').text('重新发送');
+				}
+			},1000);
+		}
+	});
+});
+
+HuajiBBS.submit('.first',function(data) {
+	HuajiBBS.request('<{url('user','forget_ajax',1)}>',data.field,{
+		success: function(data) {
+			HuajiBBS.tips('邮箱验证通过！','success');
+			
+			$('.first').addClass('d-none');
+			$('.second').removeClass('d-none');
+			HuajiBBS.submit('.second',function(data) {
+				if(data.field.password != data.field.repassword) {
+					HuajiBBS.tips('两次密码不一致！','warning');
+				} else {
+					HuajiBBS.request('<{url('user','forget_ajax',2)}>',data.field,{
+						success: function(data) {
+							HuajiBBS.tips('修改成功！','success');
+							window.location.href = '<{url('user','login')}>';
+						}
+					});
+				}
+			});
+		}
+	});
+});
+</script>
+
+<{include file = "../include/footer.html"}>

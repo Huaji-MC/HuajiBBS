@@ -1,0 +1,101 @@
+<{include file = "../include/header.html"}>
+
+<link rel="stylesheet" href="<{URL}>static/css/user.css">
+
+<script src="<{URL}>static/lib/bootstrap-fileinput/js/fileinput.min.js"></script>
+<link rel="stylesheet" href="<{URL}>static/lib/bootstrap-fileinput/css/fileinput.min.css">
+<script src="<{URL}>static/lib/bootstrap-fileinput/js/locales/zh.js"></script>
+<script src="<{URL}>static/lib/bootstrap-fileinput/themes/fa/theme.min.js"></script>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item active">修改资料</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="row">
+		<div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 left">
+			<ul class="navbar-nav tab">
+				<li id="0" href="<{url('user','setting',0)}>"><i class="fa fa fa-user-circle-o"></i> 修改头像</li>
+				<li id="1" href="<{url('user','setting',1)}>"><i class="fa fa fa-address-card-o"></i> 个人资料</li>
+				<li id="2" href="<{url('user','setting',2)}>"><i class="fa fa-key"></i> 修改密码</li>
+			</ul>
+		</div>
+		<div class="col-sm-10 col-md-10 col-lg-10 col-xl-10 right">
+			<{if $p_0 == 0}>
+			<h2>我的头像</h2>
+			<p>如果你还没有设置头像，系统会显示默认头像</p>
+			<img src="<{$_U.avatar}>" width="30%">
+			<hr>
+			<h2>上传新头像</h2>
+			<p>HuajiBBS暂不支持裁剪图片，请上传正方形头像，若非正方形，系统将自动拉伸为正方形</p>
+			<div class="border p-3 mb-3 rounded">
+				<h5>
+					头像上传
+					<button class="btn btn-outline-info btn-sm float-right" onclick="$('#upload').click();" type="button"><i class="fa fa-upload"></i> 上传</button>
+				</h5>
+				<div class="file-loading">
+					<input id="upload" name="upload" type="file" class="file" multiple data-overwrite-initial="false">
+				</div>
+			</div>
+			<script>
+			$("#upload").fileinput({
+				language: 'zh',
+				theme: 'fa',
+				uploadUrl: '<{url('index','upload_ajax','user')}>',
+				allowedFileExtensions: ['jpg','png','gif','jpeg','webp'],
+				overwriteInitial: false,
+				showClose: false,
+				showCaption: false,
+				showUpload: false,
+				showRemove: false,
+				maxFileSize: 1024,
+				maxFileCount: 1,
+				initialPreviewAsData:true,
+				enctype: 'multipart/form-data',
+				slugCallback: function (filename) {
+					return filename.replace('(', '_').replace(']', '_');
+				}
+			}).on('fileuploaded',function(event,data,previewId,index) {
+				var path = data.response.path;
+				HuajiBBS.request('<{url('user','set_avatar_ajax')}>',{path});
+			});
+			</script>
+			<{else if $p_0 == 1}>
+			<form action="<{url('user','set_data')}>" method="post">
+				<div class="form-group">
+					<label>介绍</label>
+					<input type="text" value="<{$_U.description}>" required class="form-control" placeholder="请输入个人介绍，最多 50 字符" name="description" maxlength="50">
+				</div>
+				<button type="submit" class="btn btn-primary">提交修改</button>
+			</form>
+			<{else if $p_0 == 2}>
+			<form action="<{url('user','set_password')}>" method="post">
+				<div class="form-group">
+					<label>原密码</label>
+					<input type="password" required class="form-control" placeholder="请输入原密码" name="old">
+				</div>
+				<div class="form-group">
+					<label>新密码</label>
+					<input type="password" required class="form-control" placeholder="请输入新密码，只能且必须包含字母和数字且在 8～20 字符之间" name="new">
+				</div>
+				<div class="form-group">
+					<label>重复新密码</label>
+					<input type="password" required class="form-control" placeholder="请重复输入新密码" name="again">
+				</div>
+				<button type="submit" class="btn btn-primary">提交修改</button>
+			</form>
+			<{/if}>
+		</div>
+	</div>
+</div>
+
+<script>
+$('.tab #<{$p_0}>').addClass('active');
+$('.tab li').click(function() {
+	location.href = $(this).attr('href');
+});
+</script>
+
+<{include file = "../include/footer.html"}>

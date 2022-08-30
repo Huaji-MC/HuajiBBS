@@ -1,0 +1,119 @@
+<{include file = '../include/header.html'}>
+
+<script src="<{URL}>static/lib/bootstrap-fileinput/js/fileinput.min.js"></script>
+<link rel="stylesheet" href="<{URL}>static/lib/bootstrap-fileinput/css/fileinput.min.css">
+<script src="<{URL}>static/lib/bootstrap-fileinput/js/locales/zh.js"></script>
+<script src="<{URL}>static/lib/bootstrap-fileinput/themes/fa/theme.min.js"></script>
+<script src="<{URL}>static/js/marked.min.js"></script>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item"><a href="<{url('forum','index',$thread.fid,0,1)}>"><{$thread.forum.name}></a></li>
+		<li class="breadcrumb-item"><a href="<{url('thread','index',$thread.tid,0,0,1)}>"><{$thread.title}></a></li>
+		<li class="breadcrumb-item active">编辑主题</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<ul class="nav nav-tabs">
+		<li class="nav-item">
+			<a class="nav-link active" data-toggle="tab" href="#edit-box">编辑</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-toggle="tab" href="#preview" id="show">预览</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active mt-3" id="edit-box">
+			<form id="edit">
+				<div class="input-group mb-3">
+					<input type="text" class="form-control" name="title" maxlength="30" placeholder="请输入标题，最多 30 字符" value="<{$thread.title}>" required>
+				</div>
+				<div class="input-group mb-3">
+					<textarea id="editor" class="form-control" name="content" rows="30" maxlength="60000" placeholder="请输入内容，最多 60000 字符" required><{$thread.content}></textarea>
+				</div>
+				<div class="border p-3 mb-3 rounded">
+					<h5>
+						图片上传
+						<button class="btn btn-outline-info btn-sm float-right" onclick="$('#upload').click();" type="button"><i class="fa fa-upload"></i> 上传（<span id="upload-count"><{count($thread.images)}></span> 张）</button>
+					</h5>
+					<br>
+					<div class="file-loading">
+						<input id="upload" name="upload" type="file" multiple class="file" data-overwrite-initial="false">
+					</div>
+					<input type="hidden" name="images" id="images">
+				</div>
+				<images
+					<{foreach from = $thread.images key = $k item = $image}>
+					initial-<{$k}>="<{$image}>"
+					<{/foreach}>></images>
+				<button type="submit" class="btn btn-primary btn-block">编 辑</button>
+			</form>
+		</div>
+		<div class="tab-pane mt-3" id="preview">
+			<div class="card-body" id="markdown"></div>
+		</div>
+	</div>
+</div>
+
+<script>
+$("#upload").fileinput({
+	language: 'zh',
+	theme: 'fa',
+	uploadUrl: '<{url('index','upload_ajax','thread')}>',
+	allowedFileExtensions: ['jpg','png','gif','jpeg','webp'],
+	overwriteInitial: false,
+	showClose: false,
+	showCaption: false,
+	showUpload: false,
+	showRemove: false,
+	maxFileSize: 1024,
+	maxFileCount: 10,
+	initialPreviewAsData:true,
+	enctype: 'multipart/form-data',
+	initialPreview: [
+		<{foreach from = $thread.images item = $image}>
+		'<{URL}><{$image}>',
+		<{/foreach}>
+	],
+	initialPreviewConfig: [
+		<{foreach from = $thread.images key = $k item = $image}>
+		{
+			url: '<{url('thread','test_json')}>',
+			key: <{$k}>
+		},
+		<{/foreach}>
+	],
+	slugCallback: function (filename) {
+		return filename.replace('(', '_').replace(']', '_');
+	}
+}).on('fileuploaded',function(event,data,previewId,index) {
+	$('images').attr(previewId,data.response.path);
+	$('#upload-count').text(parseInt($('#upload-count').text()) + 1);
+}).on('filesuccessremove',function(event,id) {
+	$('images').removeAttr(id);
+	$('#upload-count').text(parseInt($('#upload-count').text()) - 1);
+}).on('filedeleted',function(event,key) {
+	$('images').removeAttr('initial-' + key);
+	$('#upload-count').text(parseInt($('#upload-count').text()) - 1);
+});
+
+HuajiBBS.submit('#edit',function(data) {
+	var images = '';
+	$.each($('images')[0].attributes,function() {
+		images += (images ? ',' : '') + this.value;
+	});
+	HuajiBBS.request('<{url('thread','edit_ajax',$p_0)}>',{title:data.field.title,content:data.field.content,images:images},{
+		success: function(data) {
+			HuajiBBS.tips(data.msg,'success');
+			window.location.href = '<{url('thread','index',$p_0,0,0,1)}>';
+		}
+	});
+});
+
+$('#show').click(function() {
+	$('#markdown').html(marked.parse(HuajiBBS.htmlEncode($('#editor').val())));
+});
+</script>
+
+<{include file = '../include/footer.html'}>

@@ -1,0 +1,97 @@
+<{include file = "../include/header.html"}>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item active">注册</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="card">
+		<div class="card-header">注册</div>
+		<form class="card-body form">
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">用户名</span>
+				</div>
+				<input type="text" class="form-control" name="username" placeholder="请输入用户名"  required>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">邮　箱</span>
+				</div>
+				<input type="email" class="form-control" name="email" placeholder="请输入邮箱"  required>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">密　码</span>
+				</div>
+				<input type="password" class="form-control" name="password" placeholder="请输入密码" required>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">确认密码</span>
+				</div>
+				<input type="password" class="form-control" name="repassword" placeholder="请再次输入密码" required>
+			</div>
+			<{if C('register_email_code')}>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">验证码</span>
+				</div>
+				<input type="number" class="form-control" name="code" placeholder="请输入接收到的邮箱验证码"  required>
+				<div class="input-group-append">
+					<button class="btn btn-success" id="send" type="button">发送验证码</button>
+				</div>
+			</div>
+			<{/if}>
+			<div class="mb-3">
+				<span>已有账号？<a href="<{url('user','login')}>">点击登录</a></span>
+			</div>
+			<button type="submit" class="btn btn-primary btn-block">注册</button>
+		</form> 
+	</div>
+</div>
+
+<script>
+<{if C('register_email_code')}>
+$('#send').click(function() {
+	var email = $('[name="email"]').val();
+	if(! email) {
+		HuajiBBS.tips('请输入邮箱！','warning');
+		$('[name="email"]').focus();
+		return;
+	}
+	
+	HuajiBBS.request('<{url('user','email_code_ajax','register')}>',{account: email},{
+		success: function(data) {
+			HuajiBBS.tips(data.msg,'success');
+			
+			$('#send').attr('disabled','disabled').html('<span id="send-wait">120</span> 秒后重新发送');
+			setInterval(function() {
+				var wait = parseInt($('#send-wait').text());
+				$('#send-wait').text(-- wait);
+				if(wait == 0) {
+					$('#send').removeAttr('disabled').text('重新发送');
+				}
+			},1000);
+		}
+	});
+});
+<{/if}>
+
+HuajiBBS.submit('.form',function(data) {
+	if(data.field.password != data.field.repassword) {
+		HuajiBBS.tips('两次密码不一致！','danger');
+		return;
+	}
+	HuajiBBS.request('<{url('user','register_ajax')}>',data.field,{
+		success: function(data) {
+			HuajiBBS.tips('注册成功！跳转中…','success');
+			window.location.href = '<{(strpos($smarty.server.HTTP_REFERER,'user/login') === false && strpos($smarty.server.HTTP_REFERER,'user/register') === false) ? $smarty.server.HTTP_REFERER : URL}>';
+		}
+	});
+});
+</script>
+
+<{include file = "../include/footer.html"}>

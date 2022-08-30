@@ -1,0 +1,566 @@
+<{include file="../include/header.html"}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header">搜索用户</div>
+		<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">用户ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="uid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">用户名</label>
+					<div class="layui-input-block">
+						<input type="text" name="username" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">邮箱</label>
+					<div class="layui-input-block">
+						<input type="text" name="email" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">用户组</label>
+					<div class="layui-input-block">
+						<select name="gid">
+							<option value="">请选择用户组</option>
+							<{foreach from = $groups item = $group}>
+							<option value="<{$group.gid}>"><{$group.name}></option>
+							<{/foreach}>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">注册时间开始</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="start" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">注册时间结束</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="end" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<button class="layui-btn" lay-submit lay-filter="user-search">
+						<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card-body">
+			<script type="text/html" id="topBar">
+				<button class="layui-btn layui-btn-sm" lay-event="create">添加用户</button>
+				<button class="layui-btn layui-btn-sm" lay-event="ban">批量封禁</button>
+				<button class="layui-btn layui-btn-sm" lay-event="point">修改积分</button>
+				<button class="layui-btn layui-btn-sm" lay-event="msg">发送系统消息</button>
+			</script>
+			<table id="list" lay-filter="list"></table> 
+			<script type="text/html" id="rightBar">
+				<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+			</script>
+			<script type="text/html" id="edit">
+				<form class="layui-form layui-form-pane" style="padding:15px">
+					<div class="layui-form-item">
+						<label class="layui-form-label">用户名</label>
+						<div class="layui-input-block">
+							<input type="text" name="username" value="{{d.u.username}}" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">密码</label>
+						<div class="layui-input-block">
+							<input type="text" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">邮箱</label>
+						<div class="layui-input-block">
+							<input type="email" name="email" value="{{d.u.email}}" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">介绍</label>
+						<div class="layui-input-block">
+							<textarea name="description" placeholder="请输入介绍" autocomplete="off" class="layui-textarea">{{d.u.description}}</textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">头像</label>
+						<label class="layui-form-label" style="width:auto"><{URL}></label>
+						<div class="layui-input-inline">
+							<input type="text" id="avatar" name="avatar" value="{{d.u.avatar1}}" placeholder="请输入头像路径" autocomplete="off" class="layui-input">
+						</div>
+						<button type="button" class="layui-btn" id="upload-avatar"><i class="layui-icon">&#xe67c;</i> 上传</button>
+						<button type="button" class="layui-btn layui-btn-primary" id="show-avatar">预览</button>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">积分</label>
+						<div class="layui-input-block">
+							<input type="text" name="point" value="{{d.u.point}}" placeholder="请输入积分" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">用户组</label>
+						<div class="layui-input-block">
+							<select name="gid">
+								<option value="">请选择用户组</option>
+								<{foreach from = $groups item = $group}>
+								<option
+									value="<{$group.gid}>"
+									{{# if(d.u.gid == <{$group.gid}>) { }}selected{{# } }}
+									><{$group.name}></option>
+								<{/foreach}>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="edit">立即提交</button>
+						</div>
+						<div class="layui-form-mid layui-word-aux">可留空表示不修改</div>
+					</div>
+				</form>
+			</script>
+			<script type="text/html" id="create">
+				<form class="layui-form layui-form-pane" style="padding:15px">
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span color="red">*</span> 用户名</label>
+						<div class="layui-input-block">
+							<input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span color="red">*</span> 密码</label>
+						<div class="layui-input-block">
+							<input type="text" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span color="red">*</span> 邮箱</label>
+						<div class="layui-input-block">
+							<input type="email" name="email" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">介绍</label>
+						<div class="layui-input-block">
+							<textarea name="description" placeholder="请输入介绍，可选" autocomplete="off" class="layui-textarea"></textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">头像</label>
+						<label class="layui-form-label" style="width:auto"><{URL}></label>
+						<div class="layui-input-inline">
+							<input type="text" id="avatar" name="avatar" placeholder="请输入头像路径，可选，默认使用默认头像" autocomplete="off" class="layui-input">
+						</div>
+						<button type="button" class="layui-btn" id="upload-avatar"><i class="layui-icon">&#xe67c;</i> 上传</button>
+						<button type="button" class="layui-btn layui-btn-primary" id="show-avatar">预览</button>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">积分</label>
+						<div class="layui-input-block">
+							<input type="text" name="point" value="0" placeholder="请输入积分，可选，默认为 0" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span color="red">*</span> 用户组</label>
+						<div class="layui-input-block">
+							<select name="gid" required lay-verify="required">
+								<option value="">请选择用户组</option>
+								<{foreach from = $groups item = $group}>
+								<option value="<{$group.gid}>"><{$group.name}></option>
+								<{/foreach}>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="create">立即提交</button>
+						</div>
+						<div class="layui-form-mid layui-word-aux">带“*”号字段必填</div>
+					</div>
+				</form>
+			</script>
+			<script type="text/html" id="point">
+				<form class="layui-form" style="padding:15px">
+					<div class="layui-inline">
+						<div class="layui-input-inline" style="width:60px">
+							<select name="type">
+								<option value="increase">+</option>
+								<option value="reduce">-</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<div class="layui-input-inline">
+							<input type="number" name="point" placeholder="请输入增减积分数" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-top:10px">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="point">立即提交</button>
+						</div>
+					</div>
+				</form>
+			</script>
+			<script type="text/html" id="msg">
+				<form class="layui-form" style="padding:15px">
+					<div class="layui-form-item layui-form-text">
+						<div class="layui-input-inline" style="width:400px">
+							<textarea name="content" placeholder="请输入消息内容" required lay-verify="required" class="layui-textarea" rows="10"></textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="msg">立即提交</button>
+						</div>
+					</div>
+				</form>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form', 'table','laydate','laytpl','upload'], function(){
+	var $ = layui.$
+	,form = layui.form
+	,table = layui.table
+	,laydate = layui.laydate
+	,laytpl = layui.laytpl
+	,upload = layui.upload;
+	
+	laydate.render({
+		elem: "input[name='start']"
+	});
+	laydate.render({
+		elem: "input[name='end']"
+	});
+	
+	table.render({
+		elem: '#list'
+		,height: 400
+		,url: '<{url('user','search_ajax')}>'
+		,toolbar: '#topBar'
+		,page: true
+		,method: 'post'
+		,parseData: function(res) {
+			return {
+				"code": res.status,
+				"count": res.count,
+				"data": res.data
+			};
+		}
+		,response: {
+			statusCode: 1
+		}
+		
+		,cols: [[
+			{type: 'checkbox', fixed: 'left'}
+			,{field: 'uid', title: 'UID', width:80, sort: true}
+			,{field: 'username', title: '用户名', width:150}
+			,{field: 'avatar', title: '头像', width:60,templet:'<div><img height="28px" src="{{d.avatar}}"></div>'}
+			,{field: 'email', title: '邮箱', width:200}
+			,{field: 'description', title: '介绍', width:400}
+			,{field: 'point', title: '积分', width:80, sort: true}
+			,{field: 'gid', title: '用户组', width:150,templet:'<div>{{d.gid}}（{{d.group.name}}）</div>'}
+			,{field: 'threads', title: '主题', width:80, sort: true}
+			,{field: 'comments', title: '评论', width:80, sort: true}
+			,{field: 'time', title: '注册时间', width:200,sort:true,templet:'<div>{{HuajiBBS.timestamp2date(d.time)}}</div>'}
+			,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:150}
+		]]
+	});
+	
+	form.on('submit(user-search)', function(data){
+		var field = data.field;
+		
+		table.reload('list', {
+			where: field
+		});
+	});
+	
+	table.on('toolbar(list)', function(obj){
+		var checkStatus = table.checkStatus(obj.config.id);
+		var data = checkStatus.data;
+		switch(obj.event){
+			case 'create':
+				var html = $('#create').html();
+				var index = layer.open({
+					type: 1,
+					area: ['100%','100%'],
+					content: html
+				});
+				HuajiBBS.color();
+				form.render('select');
+				var uploadAvatar = upload.render({
+					elem: '#upload-avatar'
+					,url: '<{url('index','upload_ajax','user')}>'
+					,done: function(data){
+						if(data.status) {
+							$('#avatar').val(data.path);
+							layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					}
+					,error: function(){
+						layer.alert('上传失败！',{icon:5});
+					}
+					,exts: 'gif|png|jpg|jpeg|webp'
+					,size: 1024
+				});
+				
+				$(document).on('click','#show-avatar',function() {
+					var path = $('#avatar').val();
+					layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+				});
+				
+				form.on('submit(create)',function(data) {
+					$.post('<{url('user','create_ajax')}>',data.field,function(data) {
+						if(data.status) {
+							layer.msg('添加成功',{icon:6});
+							table.reload('list');
+							layer.close(index);
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					
+					return false;
+				});
+				break;
+			case 'ban':
+				if(data.length == 0) {
+					layer.msg('请选择用户');
+					break;
+				}
+				layer.alert('确定要封禁吗？请谨慎操作',{
+					icon: 0,
+					title: '你正在封禁 '+data.length+' 个用户',
+					yes: function(index) {
+						$.each(data,function(index,value) {
+							$.post('<{url('user','edit_ajax')}>',{uid:value.uid,gid:2},function(data) {
+								if(data.status) {
+									layer.msg('封禁成功：'+value.uid,{icon:6});
+									table.reload('list');
+									
+									$.post('<{url('user','send_sys_msg')}>',{uid:value.uid,content:'你的账号已被封禁'});
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">封禁失败（'+value.uid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				break;
+			case 'point':
+				if(data.length == 0) {
+					layer.msg('请选择用户');
+					break;
+				}
+				var getTpl = $('#point').html();
+				laytpl(getTpl).render({}, function(html) {
+					var lindex = layer.open({
+						type: 1,
+						title:'你正在修改 '+data.length+' 个用户的积分',
+						content: html
+					});
+					form.render('select');
+					form.on('submit(point)',function(form) {
+						$.each(data,function(index,value) {
+							if(form.field.type == 'increase') {
+								var text = '+' + form.field.point;
+								var point = parseInt(value.point) + parseInt(form.field.point);
+							} else {
+								var text = form.field.point;
+								var point = parseInt(value.point) - parseInt(form.field.point);
+							}
+							$.post('<{url('user','edit_ajax')}>',{uid:value.uid,point},function(data) {
+								if(data.status) {
+									layer.msg('修改成功：'+value.uid,{icon:6});
+									table.reload('list');
+									layer.close(lindex);
+									$.post('<{url('user','send_sys_msg')}>',{uid:value.uid,content:'你的积分已被修改：'+text});
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">修改失败（'+value.uid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+						return false;
+					});
+				});
+				break;
+			case 'msg':
+				if(data.length == 0) {
+					layer.msg('请选择用户');
+					break;
+				}
+				var getTpl = $('#msg').html();
+				laytpl(getTpl).render({}, function(html) {
+					var lindex = layer.open({
+						type: 1,
+						title:'发送系统消息',
+						content: html
+					});
+					form.on('submit(msg)',function(form) {
+						$.each(data,function(index,value) {
+							$.post('<{url('user','send_sys_msg')}>',{uid:value.uid,content:form.field.content},function(data) {
+								if(data.status) {
+									layer.msg('发送成功：'+value.uid,{icon:6});
+									layer.close(lindex);
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">发送失败（'+value.uid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+						return false;
+					});
+				});
+				break;
+		};
+	});
+
+	table.on('tool(list)', function(obj) {
+		var data = obj.data;
+		var event = obj.event;
+		var tr = obj.tr;
+		
+		if(event == 'edit') {
+			var getTpl = $('#edit').html();
+			var d = {u:data};
+			laytpl(getTpl).render(d, function(html) {
+				var index = layer.open({
+					type: 1,
+					area: ['100%','100%'],
+					content: html
+				});
+				form.render('select');
+				var uploadAvatar = upload.render({
+					elem: '#upload-avatar'
+					,url: '<{url('index','upload_ajax','user')}>'
+					,done: function(data){
+						if(data.status) {
+							$('#avatar').val(data.path);
+							layer.alert('上传成功，图片路径已自动填入文本框',{icon:6});
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					}
+					,error: function(){
+						layer.alert('上传失败！',{icon:5});
+					}
+					,exts: 'gif|png|jpg|jpeg|webp'
+					,size: 1024
+				});
+				
+				$(document).on('click','#show-avatar',function() {
+					var path = $('#avatar').val();
+					layer.alert('<img src="<{URL}>'+path+'" style="width:250px">',{title:'预览'});
+				});
+				
+				form.on('submit(edit)',function(form) {
+					$.post('<{url('user','edit_ajax')}>',Object.assign({uid:data.uid},form.field),function(data) {
+						if(data.status) {
+							layer.msg(data.msg,{icon:6});
+							table.reload('list');
+							layer.close(index);
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					return false;
+				});
+			});
+		} else if(event == 'delete') {
+			layer.alert('确定要删除吗？删除后用户将恢复到初始状态',{
+				icon: 0,
+				title: '删除用户',
+				yes: function(index) {
+					$.get("<{url('user','delete_ajax','"+data.uid+"')}>",function(data) {
+						if(data.status) {
+							layer.msg('删除成功',{icon:6});
+							table.reload('list');
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					layer.close(index);
+				}
+			});
+		}
+	});
+});
+</script>
+
+<{include file="../include/footer.html"}>

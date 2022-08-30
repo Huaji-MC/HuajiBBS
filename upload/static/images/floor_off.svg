@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="27" height="27" xmlns="http://www.w3.org/2000/svg">
+	<circle cx="13.5" cy="13.5" r="12" stroke="gray" stroke-width="1.5" fill-opacity="0" />
+	<text x="4" y="20" fill="gray" style="font-size:18px">楼</text>
+</svg>

@@ -1,0 +1,50 @@
+<{include file = "../include/header.html"}>
+
+<{assign var='isme' value=<{($p_0 == UID) ? true : false}>}>
+<{assign var='name' value=<{($isme) ? '我' : 'Ta'}>}>
+
+<link rel="stylesheet" href="<{URL}>static/css/user.css">
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item active"><{$user.username}> 的主页</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="row">
+		<div class="col-sm-3 col-md-3 col-lg-2 col-xl-2 left">
+			<div class="info">
+				<img src="<{$user.avatar}>" class="rounded-circle img-thumbnail" width="50%">
+				<br><br><p color="<{$user.group.font_color}>"><{$user.username}></p>
+				<div class="nav">
+					<li class="nav-item">
+						<b><{$user.comments}></b>
+						<p>评论</p>
+					</li>
+					<li class="nav-item">
+						<b><{$user.praises}></b>
+						<p>点赞</p>
+					</li>
+					<li class="nav-item">
+						<b><{$user.threads}></b>
+						<p>主题</p>
+					</li>
+				</div>
+			</div>
+			<ul class="navbar-nav tab">
+				<li id="index" href="<{url('user','index',$p_0)}>"><i class="fa fa-tachometer"></i> 首页中心</li>
+				<li id="threads" href="<{url('user','threads',$p_0,1)}>"><i class="fa fa-cube"></i> <{$name}>的主题</li>
+				<li id="comments" href="<{url('user','comments',$p_0,1)}>"><i class="fa fa-edit"></i> <{$name}>的评论</li>
+				<li id="praises" href="<{url('user','praises',$p_0,1)}>"><i class="fa fa-thumbs-o-up"></i> <{$name}>的点赞</li>
+				<li id="rewards" href="<{url('user','rewards',$p_0,1)}>"><i class="fa fa-credit-card"></i> <{$name}>的打赏</li>
+				<{if $isme}>
+				<li id="messages" href="<{url('user','message',0,1)}>"><i class="fa fa-envelope"></i> 消息中心 <span class="red-dot msg-notice" style="display:none"></span></li>
+				<li id="edit" href="<{url('user','setting',0)}>"><i class="fa fa-gear"></i> 编辑资料</li>
+				<{if $_U.gid == 3}>
+				<li href="<{URL}>index.php/admin.html"><i class="fa fa-dashboard"></i> 进入后台</li>
+				<{/if}>
+				<{/if}>
+			</ul>
+		</div>
+		<div class="col-sm-9 col-md-9 col-lg-10 col-xl-10 right">

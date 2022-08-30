@@ -1,0 +1,306 @@
+<{include file = '../include/header.html'}>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item"><a href="<{url('forum','index',$thread.fid,0,1)}>"><{$thread.forum.name}></a></li>
+		<li class="breadcrumb-item active"><{$thread.title}></li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="border p-3">
+		<h4>
+			<{if $thread.points}>
+			<span class="badge badge-danger"><{number($thread.points)}></span>
+			<{/if}>
+			<{$thread.title}>
+			<span class="float-right">
+				<{if time() - $thread.time <= 12 * 60 * 60}>
+				<span class="badge badge-success">最新</span>
+				<{/if}>
+				<{if $thread.comments >= 200}>
+				<span class="badge badge-danger">热门</span>
+				<{/if}>
+				<{if $thread.essence}>
+				<span class="badge badge-warning text-light">精华</span>
+				<{/if}>
+				<{if $thread.lock}>
+				<span class="badge badge-info">锁定</span>
+				<{/if}>
+				<{if $thread.top == 1}>
+				<span class="badge badge-secondary">置顶</span>
+				<{else if $thread.top == 2}>
+				<span class="badge badge-dark">公告</span>
+				<{/if}>
+			</span>
+		</h4>
+		<p class="text-muted">
+			<span><{timeFormat($thread.time)}></span>
+			<span class="float-right">
+			
+				<{if ($thread.uid == UID && $_U.group.permission.thread_author) || $_U.group.permission.thread_admin || $isModerator}>
+				<a class="btn btn-sm btn-outline-secondary" id="delete">删除</a>
+				<a class="btn btn-sm btn-outline-secondary" href="<{url('thread','edit',$p_0)}>">编辑</a>
+				<{/if}>
+				<{if $_U.group.permission.thread_admin || $isModerator}>
+				<a class="btn btn-sm btn-outline-secondary action" data-type="essence"><{if $thread.essence}>取消<{/if}>精华</a>
+				<a class="btn btn-sm btn-outline-secondary action" data-type="lock"><{if $thread.lock}>取消<{/if}>锁定</a>
+				<a class="btn btn-sm btn-outline-secondary action" data-type="top1"><{if $thread.top == 1}>取消<{/if}>版块置顶</a>
+				<a class="btn btn-sm btn-outline-secondary action" data-type="top2"><{if $thread.top == 2}>取消<{/if}>全站置顶</a>
+				<{/if}>
+			</span>
+		</p>
+		<p class="text-muted">
+			<span class="mr-3"><i class="fa fa-eye"></i> <{$thread.views}></span>
+			<a class="mr-3 text-muted" href="#comments"><i class="fa fa-commenting-o"></i> <{$thread.comments}></a>
+			<span class="mr-3"><i class="fa fa-thumbs-o-up"></i> <{$thread.praises}></span>
+			<a class="float-right text-muted" href="<{url('forum','index',$thread.forum.fid,0,1)}>">
+				<{$thread.forum.name}>
+				<i class="fa fa-angle-right"></i>
+			</a>
+		</p>
+		
+		<{if $p_3 == 1}>
+			<div class="media border border-left-0 border-right-0 pt-3">
+				<a href="<{url('user','index',$thread.user.uid)}>"><img src="<{$thread.user.avatar}>" class="mr-3 rounded-circle" style="width:50px;"></a>
+				<div class="media-body">
+					<h6 color="<{$thread.user.group.font_color}>">
+						<{$thread.user.username}>
+						<span class="float-right text-success">楼主</span>
+					</h6>
+					<p>
+						<span class="badge text-white" bgcolor="<{$thread.user.group.color}>">
+							<{$thread.user.group.name}>
+						</span>
+					</p>
+				</div>
+			</div>
+			<div class="mt-2">
+				<{if $thread.edit_time}>
+				<p class="text-center text-secondary">最后编辑于 <b><{_date($thread.edit_time)}></b></p>
+				<{/if}>
+				<p class="content"><{content($thread.content)}></p>
+				<div class="text-center">
+					<{foreach from = $thread.images item = $image}>
+					<img width="100%" src="<{URL}><{$image}>" class="mt-3">
+					<{/foreach}>
+				</div>
+			</div>
+			
+			<div class="mt-2 text-center">
+				<{if $isPraise}>
+				<button type="button" class="btn btn-danger" id="praise"><i class="fa fa-thumbs-o-up"></i> 取消点赞</button>
+				<{else}>
+				<button type="button" class="btn btn-danger" id="praise"><i class="fa fa-thumbs-o-up"></i> 点赞</button>
+				<{/if}>
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reward-box"><i class="fa fa-dollar"></i> 打赏</button>
+			</div>
+			
+			<!-- 打赏弹窗 -->
+			<div class="modal fade" id="reward-box">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">打赏主题</h5>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						<div class="modal-body">
+							<p class="text-muted">你所在用户组每天可打赏 <{$_U.group.reward_max}> <{C('point_name')}>，今日已打赏 <{$todayReward}> <{C('point_name')}>，还剩余 <span class="text-success"><{$_U.group.reward_max - $todayReward}></span> <{C('point_name')}>可打赏。</p>
+							<input type="number" class="form-control" id="reward-points" placeholder="请输入打赏<{C('point_name')}>数"> <br>
+							<textarea rows="3" class="form-control" id="reward-reason" maxlength="50" placeholder="请输入打赏理由，不超过 50 字"></textarea>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+							<button type="button" class="btn btn-primary" id="reward">打赏</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 打赏弹窗 -->
+			
+			<{if $thread.points}>
+			<script>$(function(){loadRewards();});</script>
+			<table class="table table-sm mt-3">
+				<thead class="thead-light">
+					<tr class="text-center">
+						<th width="30%">用户</th>
+						<th width="60%">理由</th>
+						<th width="10%">数量</th>
+					</tr>
+				</thead>
+				<tbody id="reward-list">
+					<tr id="reward-load" data-page="1">
+						<td colspan="3" class="text-center pt-3">
+							<a href="javascript:loadRewards();" class="text-muted">点击加载</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<{/if}>
+		<{/if}>
+	</div>
+	
+	<div id="comments" class="mt-3 p-3 border">
+		<h5>
+			<span>评论 <small class="text-muted"><{$commentTotal}></small></span>
+			
+			<span class="float-right">
+				<!-- 楼主模式 -->
+				<{if $p_1}>
+				<a class="btn btn-sm btn-outline-secondary" href="<{url('thread','index',$p_0,0,$p_2,$p_3)}>">查看全部</a>
+				<{else}>
+				<a class="btn btn-sm btn-outline-secondary" href="<{url('thread','index',$p_0,1,$p_2,$p_3)}>">只看楼主</a>
+				<{/if}>
+				
+				<!-- 排序方式 -->
+				<{if $p_2}>
+				<a class="btn btn-sm btn-outline-secondary" href="<{url('thread','index',$p_0,$p_1,0,$p_3)}>">倒序</a>
+				<{else}>
+				<a class="btn btn-sm btn-outline-secondary" href="<{url('thread','index',$p_0,$p_1,1,$p_3)}>">顺序</a>
+				<{/if}>
+			</span>
+		</h5>
+		
+		<{if $comments}>
+			<ul class="list-group list-group-flush">
+				<{foreach from = $comments item = $comment key = $key}>
+				<li class="list-group-item">
+					<div class="media pt-3">
+						<a href="<{url('user','index',$comment.user.uid)}>"><img src="<{$comment.user.avatar}>" class="mr-3 rounded-circle" style="width:50px;"></a>
+						<div class="media-body">
+							<h6 color="<{$comment.user.group.font_color}>">
+								<{$comment.user.username}>
+								<span class="float-right text-success"># <{($p_3 - 1) * 30 + $key + 1}></span>
+							</h6>
+							<p>
+								<{if $comment.uid == $thread.uid}>
+								<span class="badge badge-primary">楼主</span>
+								<{/if}>
+								<span class="badge text-white" bgcolor="<{$comment.user.group.color}>">
+									<{$comment.user.group.name}>
+								</span>
+								<span class="float-right text-muted"><{timeFormat($comment.time)}></span>
+							</p>
+							
+							<p class="content"><{content($comment.content)}></p>
+							
+							<ul class="nav float-right comment-action-list">
+								<{if ($_U.group.permission.comment_author && ($comment.uid == UID || $thread.uid == UID)) || $isModerator || $_U.group.permission.comment_admin}>
+								<li class="nav-item"><a class="nav-link" href="#" data-toggle="modal" data-target="#comment-delete-<{$comment.cid}>">删除</a></li>
+								<{/if}>
+								<li class="nav-item"><a class="nav-link copy-comment" href="javascript:HuajiBBS.copy('<{nl2str($comment.content)}>').tips('复制成功','success');">复制全文</a></li>
+							</ul>
+							
+							<!-- 删除弹窗 -->
+							<div class="modal fade" id="comment-delete-<{$comment.cid}>">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title">你确定要删除此评论吗？</h5>
+											<button type="button" class="close" data-dismiss="modal">&times;</button>
+										</div>
+										<div class="modal-body">
+											<{quote_comment($comment)}>
+											删除后将永远无法恢复，如果你坚持删除，请点击【确定】，否则请点击【取消】。
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+											<button type="button" class="btn btn-primary comment-delete" data-id="<{$comment.cid}>">确定</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- 删除弹窗 -->
+						</div>
+					</div>
+				</li>
+				<{/foreach}>
+			</ul>
+			<div class="pt-3">
+				<{pagination($commentTotal,30,$p_3,url('thread','index',$p_0,$p_1,'{{page}}'))}>
+			</div>
+		<{/if}>
+		
+		<{if ! $thread.lock}>
+		<form class="mt-3" id="post">
+			<textarea class="form-control" id="post-content" rows="6" name="content" maxlength="60000" placeholder="请输入回复内容，最多 60000 字符，支持 Markdown 语法" required></textarea>
+			<div id="comment-preview" class="border rounded p-3" style="display:none;min-height:200px"></div>
+			<div class="mt-2">
+				<button class="btn btn-primary" type="submit">回复</button>
+				<button class="btn btn-outline-primary" type="button" id="comment-show">预览</button>
+			</div>
+		</form>
+		<{/if}>
+	</div>
+</div>
+
+<script>
+$('#praise').click(function() { HuajiBBS.request('<{url('thread','praise_ajax',$p_0)}>'); });
+
+$('#reward').click(function() {
+	var points = $('#reward-points').val(),
+	    reason = $('#reward-reason').val();
+	HuajiBBS.request("<{url('thread','reward_ajax',$p_0,'" + points + "')}>",{reason});
+});
+
+HuajiBBS.submit('#post',function(data) { HuajiBBS.request('<{url('thread','post_ajax',$p_0)}>',{content: data.field.content}); });
+
+$('.comment-delete').click(function() {
+	var cid = $(this).data('id');
+	HuajiBBS.request("<{url('thread','delete_comment_ajax','" + cid + "')}>");
+});
+
+$('.action').click(function() {
+	var title = $(this).text();
+	var type = $(this).data('type');
+	if(confirm('你确定要将主题' + title + '吗？') == true) {
+		HuajiBBS.request("<{url('thread','action_ajax',$p_0,'" + type + "')}>");
+	}
+});
+
+$('#delete').click(function() {
+	if(confirm('你确定要删除主题吗？') == true) {
+		HuajiBBS.request("<{url('thread','delete_ajax',$p_0)}>");
+	}
+});
+
+function loadRewards() {
+	var page = $('#reward-load').data('page');
+	$.get("<{url('thread','reward_list_ajax',$p_0,'" + page + "')}>",function(data) {
+		if(data.status) {
+			HuajiBBS.tips(data.msg,'success');
+		} else {
+			HuajiBBS.tips(data.msg,'warning');
+			$('#reward-load').remove();
+			return;
+		}
+		var html = '';
+		$.each(data.data,function(index,value) {
+			html += '<tr>';
+			html += '<td><a href="<{url('user','index',"'+value.user.uid+'")}>"><img class="rounded" src="'+value.user.avatar+'" height="30"> <span color="'+value.user.group.font_color+'">'+value.user.username+'</span></a></td>';
+			html += '<td>'+value.reason+'</td>';
+			html += '<td>'+value.points+'</td>';
+			html += '</tr>';
+		});
+		$('#reward-load').before(html);
+		HuajiBBS.color();
+		$('#reward-load').data('page',$('#reward-load').data('page') + 1);
+	});
+}
+
+var show = false;
+$('#comment-show').click(function() {
+	if(! show) {
+		$('#comment-preview').html(marked.parse(HuajiBBS.htmlEncode($('#post-content').val())));
+		$('#post-content').hide();
+		$('#comment-preview').show();
+		show = true;
+	} else {
+		$('#post-content').show();
+		$('#comment-preview').hide();
+		show = false;
+	}
+});
+</script>
+
+<{include file = '../include/footer.html'}>

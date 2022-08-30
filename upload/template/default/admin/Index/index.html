@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title><{C('site_name')}>管理后台 - 控制台<{C('title_end_content')}></title>
+	<link rel="stylesheet" href="<{URL}>static/lib/layui/css/layui.css" media="all">
+	<script src="<{URL}>static/lib/layui/layui.js" charset="utf-8"></script>
+	<script src="<{URL}>static/js/jquery.min.js"></script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<div class="layui-header">
+			<div class="layui-logo layui-hide-xs layui-bg-black"><{C('site_name')}>管理后台</div>
+			<ul class="layui-nav layui-layout-left">
+				<li class="layui-nav-item layui-hide-xs"><a href="#index/console">控制台</a></li>
+				<li class="layui-nav-item layui-hide-xs"><a href="<{URL}>">返回前台</a></li>
+				<li class="layui-nav-item layui-hide-xs"><a href="<{url('admin','logout')}>">退出登录</a></li>
+			</ul>
+			<ul class="layui-nav layui-layout-right">
+				<li class="layui-nav-item layui-show-md-inline-block">
+					<a href="javascript:;">
+						<img src="<{$_U.avatar}>" class="layui-nav-img">
+						<{$_U.username}>
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+		<div class="layui-side layui-bg-black">
+			<div class="layui-side-scroll">
+				<ul class="layui-nav layui-nav-tree">
+					<li class="layui-nav-item">
+						<a href="javascript:;">站点配置</a>
+						<dl class="layui-nav-child">
+							<dd><a href="#config/server">服务器信息</a></dd>
+							<dd><a href="#config/site">站点配置</a></dd>
+							<dd><a href="#config/bbs">社区配置</a></dd>
+							<dd><a href="#config/smtp">SMTP配置</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">用户管理</a>
+						<dl class="layui-nav-child">
+							<dd><a href="#user/index">用户管理</a></dd>
+							<dd><a href="#usergroup/index">用户组管理</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="#forum/index">版块管理</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="#thread/index">主题管理</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="#comment/index">评论管理</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="#template/index">模板管理</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">运营相关</a>
+						<dl class="layui-nav-child">
+							<dd><a href="#operation/friendshiplinks">友链管理</a></dd>
+						</dl>
+					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="layui-body" style="background-color:#F3F3F3;">
+			<iframe src="<{url('index','console')}>" id="main" frameborder="0" scrolling="yes" style="overflow: visible;width:100%;height:100%;display:block" allowTransparency="true"></iframe>
+		</div>
+		
+		<div class="layui-footer">
+			Powered by HuajiBBS 1.0.
+			Copyright © 2021 HuajiMC. All Rights Reserved.
+		</div>
+	</div>
+	
+	<script>
+	layui.use(['element', 'layer', 'util'], function(){
+		var element = layui.element
+		,layer = layui.layer
+		,util = layui.util
+		,$ = layui.$;
+		
+		function router() {
+			var index = location.href.indexOf('#');
+			var index = index == -1 ? location.href.length - 1 : index;
+			var str = location.href.substr(index + 1);
+			var request = str.split('/').length != 1 ? str.split('/') : ['index','console'];
+			var url = "<{url('"+request[0]+"','"+request[1]+"')}>";
+			$('#main').attr('src',url);
+			var a = $('a[href="#'+request[0]+'/'+request[1]+'"]');
+			$("title").text("<{C('site_name')}>管理后台 - " + a.text() + "<{C('title_end_content')}>");
+			if(a.parent()[0].tagName == 'DD') {
+				a.parent().addClass('layui-this');
+				a.parent().parent().parent().addClass('layui-nav-itemed');
+				element.render('nav');
+			} else {
+				a.parent().addClass('layui-this');
+			}
+		}
+		$(function() {
+			router();
+			var storedHash = window.location.hash;
+			window.setInterval(function() {
+				if(window.location.hash != storedHash) {
+					storedHash = window.location.hash;
+					router();
+				}
+			}, 100);
+		});
+	});
+	</script>
+</body>
+</html>

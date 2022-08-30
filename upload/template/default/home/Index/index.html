@@ -1,0 +1,36 @@
+<{include file = '../include/header.html'}>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item active">首页</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<ul class="list-group forum-list">
+		<{foreach from = $forumList item = $forum}>
+		<li class="list-group-item list-group-item-light">
+			<div class="media">
+				<a href="<{url('forum','index',$forum.fid,0,1)}>"><img src="<{$forum.icon}>" class="mr-3 rounded" style="width:60px;"></a>
+				<div class="media-body">
+					<h2><a href="<{url('forum','index',$forum.fid,0,1)}>"><{$forum.name}></a></h2>
+					<p class="float-right">
+						<span class="mr-3"><b>热度</b> <{$forum.hot}></span>
+						<span class="mr-3"><b>主题</b> <{$forum.threads}></span>
+					</p>
+					<p>
+						<span><{$forum.description}></span> <br>
+						<span class="ellipsis-1">版主：
+							<{foreach from = $forum.moderators key = $k item = $moderator}>
+							<{($k != 0) ? '、' : ''}>
+							<a href="<{url('user','index',$moderator.uid)}>"><{$moderator.username}></a>
+							<{/foreach}>
+						</span>
+					</p>
+				</div>
+			</div>
+		</li>
+		<{/foreach}>
+	</ul>
+</div>
+
+<{include file = '../include/footer.html'}>

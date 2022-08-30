@@ -1,0 +1,229 @@
+<{include file="../include/header.html"}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header">搜索评论</div>
+		<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">评论ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="cid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">作者ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="uid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">主题ID</label>
+					<div class="layui-input-block">
+						<input type="number" name="tid" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">内容（模糊搜索）</label>
+					<div class="layui-input-block">
+						<input type="text" name="content" placeholder="请输入" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发表时间开始</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="start" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发表时间结束</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="end" placeholder="年-月-日">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<button class="layui-btn" lay-submit lay-filter="search">
+						<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="layui-card-body">
+			<script type="text/html" id="topBar">
+				<button class="layui-btn layui-btn-sm" lay-event="delete">批量删除</button>
+			</script>
+			<table id="list" lay-filter="list"></table> 
+			<script type="text/html" id="rightBar">
+				<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+			</script>
+			
+			<script type="text/html" id="edit">
+				<form class="layui-form" style="padding:15px">
+					<div class="layui-form-item layui-form-text">
+						<div class="layui-input-inline" style="width:400px">
+							<textarea name="content" placeholder="请输入内容" required lay-verify="required" class="layui-textarea" rows="10">{{d.content}}</textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="edit">立即提交</button>
+						</div>
+					</div>
+				</form>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form', 'table','laydate','laytpl'], function(){
+	var $ = layui.$
+	,form = layui.form
+	,table = layui.table
+	,laydate = layui.laydate
+	,laytpl = layui.laytpl;
+	
+	laydate.render({
+		elem: "input[name='start']"
+	});
+	laydate.render({
+		elem: "input[name='end']"
+	});
+	
+	table.render({
+		elem: '#list'
+		,height: 400
+		,url: '<{url('comment','search_ajax')}>'
+		,toolbar: '#topBar'
+		,page: true
+		,method: 'post'
+		,parseData: function(res) {
+			return {
+				"code": res.status,
+				"count": res.count,
+				"data": res.data
+			};
+		}
+		,response: {
+			statusCode: 1
+		}
+		
+		,cols: [[
+			{type: 'checkbox', fixed: 'left'}
+			,{field: 'cid', title: 'CID', width:80, sort: true}
+			,{field: 'uid', title: '作者', width:180,templet:'<div><img height="28px" width="28px" src="{{d.user.avatar}}"> [UID:{{d.uid}}]{{d.user.username}}</div>'}
+			,{field: 'tid', title: '评论', width:250,templet:'<div>[TID:{{d.tid}}]{{d.thread.title}}</div>'}
+			,{field: 'content', title: '内容', width:320}
+			,{field: 'time', title: '发表时间', width:200,sort:true,templet:'<div>{{HuajiBBS.timestamp2date(d.time)}}</div>'}
+			,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:150}
+		]]
+	});
+	
+	form.on('submit(search)', function(data){
+		var field = data.field;
+		
+		table.reload('list', {
+			where: field
+		});
+	});
+	
+	
+	table.on('toolbar(list)', function(obj){
+		var checkStatus = table.checkStatus(obj.config.id);
+		var data = checkStatus.data;
+		switch(obj.event){
+			case 'delete':
+				if(data.length == 0) {
+					layer.msg('请选择评论');
+					break;
+				}
+				layer.alert('确定要删除吗？请谨慎操作',{
+					icon: 0,
+					title: '你正在删除 '+data.length+' 个评论',
+					yes: function(index) {
+						$.each(data,function(index,value) {
+							$.get("<{url('comment','delete_ajax','"+value.cid+"')}>",function(data) {
+								if(data.status) {
+									layer.msg('删除成功：'+value.cid,{icon:6});
+									table.reload('list');
+								} else {
+									layer.open({
+										type:1,
+										content: '<div style="padding:20px">删除失败（'+value.cid+'）：' + data.msg + '</div>',
+										icon:5,
+										area: ['300px'],
+										shade: false,
+										offset: [
+											Math.random()*($(window).height()-300)
+											,Math.random()*($(window).width()-390)
+										],
+										zIndex: layer.zIndex,
+										btn: ['关闭', '全部关闭']
+										,yes: function(index){
+											layer.close(index);
+										}
+										,btn2: function(){
+											layer.closeAll();
+										}
+										,success: function(layero, index){
+											layer.setTop(layero);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				break;
+		};
+	});
+
+	table.on('tool(list)', function(obj) {
+		var data = obj.data;
+		var event = obj.event;
+		var tr = obj.tr;
+		
+		if(event == 'edit') {
+			var getTpl = $('#edit').html();
+			laytpl(getTpl).render(data, function(html) {
+				var index = layer.open({
+					type: 1,
+					content: html
+				});
+				form.on('submit(edit)',function(form) {
+					$.post('<{url('comment','edit_ajax')}>',Object.assign({cid:data.cid},form.field),function(data) {
+						if(data.status) {
+							layer.msg(data.msg,{icon:6});
+							table.reload('list');
+							layer.close(index);
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					return false;
+				});
+			});
+		} else if(event == 'delete') {
+			layer.alert('确定要删除吗？请谨慎操作',{
+				icon: 0,
+				title: '删除评论',
+				yes: function(index) {
+					$.get("<{url('comment','delete_ajax','"+data.cid+"')}>",function(data) {
+						if(data.status) {
+							layer.msg('删除成功',{icon:6});
+							table.reload('list');
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					layer.close(index);
+				}
+			});
+		}
+	});
+});
+</script>
+
+<{include file="../include/footer.html"}>

@@ -1,0 +1,271 @@
+<{include file="../include/header.html"}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header">用户组管理</div>
+		<div class="layui-card-body">
+			<blockquote class="layui-elem-quote">普通用户、管理员、封禁用户 三个默认用户组不能删除</blockquote>
+			<blockquote class="layui-elem-quote">系统会自动根据用户积分所处于的积分段赋予对应用户组（最小积分≤用户积分＜最大积分）），请不要使两个用户组的积分段发生重叠，要是赋错了可不怪我</blockquote>
+			<blockquote class="layui-elem-quote">最大（小）积分为-1的用户组表示无法升级，只能手动赋予</blockquote>
+			<blockquote class="layui-elem-quote">如需实现自动升级，请将普通用户（因为这是用户默认用户组）的最小积分设置为0，每一级的最大积分需等于下一级的最小积分</blockquote>
+			<script type="text/html" id="topBar">
+				<button class="layui-btn layui-btn-sm" lay-event="create">添加用户组</button>
+			</script>
+			<table id="list" lay-filter="list"></table>
+			<script type="text/html" id="rightBar">
+				<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+			</script>
+			<script type="text/html" id="permission">
+				请打开查看
+				<div class="layui-form">
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<input type="checkbox" title="主题点赞" lay-skin="primary" {{# if(d.permission.thread_praise) { }}checked{{# } }}>
+							<input type="checkbox" title="主题打赏" lay-skin="primary" {{# if(d.permission.thread_reward) { }}checked{{# } }}>
+							<input type="checkbox" title="主题回复" lay-skin="primary" {{# if(d.permission.thread_post) { }}checked{{# } }}>
+							<input type="checkbox" title="主题发表" lay-skin="primary" {{# if(d.permission.thread_create) { }}checked{{# } }}>
+							<input type="checkbox" title="主题管理员操作" lay-skin="primary" {{# if(d.permission.thread_admin) { }}checked{{# } }}>
+							<input type="checkbox" title="主题作者操作" lay-skin="primary" {{# if(d.permission.thread_author) { }}checked{{# } }}>
+							<input type="checkbox" title="评论管理员操作" lay-skin="primary" {{# if(d.permission.comment_admin) { }}checked{{# } }}>
+							<input type="checkbox" title="评论作者操作" lay-skin="primary" {{# if(d.permission.comment_author) { }}checked{{# } }}>
+							<input type="checkbox" title="资料修改" lay-skin="primary" {{# if(d.permission.user_setting) { }}checked{{# } }}>
+						</div>
+					</div>
+				</div>
+			</script>
+			<script type="text/html" id="edit">
+				<form class="layui-form layui-form-pane" style="padding:15px">
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> 名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="name" value="{{d.name}}" placeholder="请输入用户组名称，最多 10 字符" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> ［最小积分</label>
+						<div class="layui-input-block">
+							<input type="number" name="min" value="{{d.point_min}}" placeholder="请输入最小积分（包含）" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> 最大积分）</label>
+						<div class="layui-input-block">
+							<input type="number" name="max" value="{{d.point_max}}" placeholder="请输入最大积分（不包含）" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+						<div class="layui-form-mid layui-word-aux">最大积分和最小积分其中一个为 -1 时，另一个会自动修改为 -1</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> 用户名颜色</label>
+						<div class="layui-input-inline">
+							<input type="text" id="font-color" name="font_color" value="{{d.font_color}}" placeholder="请输入用户名颜色" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+						<div id="edit-font-color"></div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> 组标识颜色</label>
+						<div class="layui-input-inline">
+							<input type="text" id="color" name="color" value="{{d.color}}" placeholder="请输入用户组标识颜色" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+						<div id="edit-color"></div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="layui-font-red">*</span> 打赏限额</label>
+						<div class="layui-input-block">
+							<input type="number" name="reward_max" value="{{d.reward_max}}" placeholder="请输入每日打赏限额" required lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">权限</label>
+						<div class="layui-input-inline">
+							<input name="permission[thread_praise]" type="hidden" value="">
+							<input name="permission[thread_praise]" type="checkbox" title="主题点赞" lay-skin="primary" {{# if(d.permission.thread_praise) { }}checked{{# } }}>
+							<input name="permission[thread_reward]" type="hidden" value="">
+							<input name="permission[thread_reward]" type="checkbox" title="主题打赏" lay-skin="primary" {{# if(d.permission.thread_reward) { }}checked{{# } }}>
+							<input name="permission[thread_post]" type="hidden" value="">
+							<input name="permission[thread_post]" type="checkbox" title="主题回复" lay-skin="primary" {{# if(d.permission.thread_post) { }}checked{{# } }}>
+							<input name="permission[thread_create]" type="hidden" value="">
+							<input name="permission[thread_create]" type="checkbox" title="主题发表" lay-skin="primary" {{# if(d.permission.thread_create) { }}checked{{# } }}>
+							<input name="permission[thread_admin]" type="hidden" value="">
+							<input name="permission[thread_admin]" type="checkbox" title="主题管理员操作" lay-skin="primary" {{# if(d.permission.thread_admin) { }}checked{{# } }}>
+							<input name="permission[thread_author]" type="hidden" value="">
+							<input name="permission[thread_author]" type="checkbox" title="主题作者操作" lay-skin="primary" {{# if(d.permission.thread_author) { }}checked{{# } }}>
+							<input name="permission[comment_admin]" type="hidden" value="">
+							<input name="permission[comment_admin]" type="checkbox" title="评论管理员操作" lay-skin="primary" {{# if(d.permission.comment_admin) { }}checked{{# } }}>
+							<input name="permission[comment_author]" type="hidden" value="">
+							<input name="permission[comment_author]" type="checkbox" title="评论作者操作" lay-skin="primary" {{# if(d.permission.comment_author) { }}checked{{# } }}>
+							<input name="permission[user_setting]" type="hidden" value="">
+							<input name="permission[user_setting]" type="checkbox" title="资料修改" lay-skin="primary" {{# if(d.permission.user_setting) { }}checked{{# } }}>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn" lay-submit lay-filter="edit">立即提交</button>
+						</div>
+					</div>
+				</form>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+layui.use(['form', 'table','laytpl','colorpicker'], function(){
+	var $ = layui.$
+	,form = layui.form
+	,table = layui.table
+	,laytpl = layui.laytpl
+	,colorpicker = layui.colorpicker;
+	
+	table.render({
+		elem: '#list'
+		,height: 400
+		,url: '<{url('usergroup','user_group_list')}>'
+		,toolbar: '#topBar'
+		,page: true
+		,method: 'post'
+		,parseData: function(res) {
+			return {
+				"code": res.status,
+				"count": res.count,
+				"data": res.data
+			};
+		}
+		,response: {
+			statusCode: 1
+		}
+		,cols: [[
+			{type: 'checkbox', fixed: 'left'}
+			,{field: 'gid', title: 'GID', width:80, sort: true}
+			,{field: 'name', title: '用户组名称', width:150}
+			,{field: 'point_min', title: '最小积分(包含)', width:150, sort: true}
+			,{field: 'point_max', title: '最大积分(不包含)', width:160, sort: true}
+			,{field: 'font_color', title: '用户名颜色', width:120,templet:'<div><div style="background-color:{{d.font_color}}">{{d.font_color}}</div></div>'}
+			,{field: 'color', title: '用户名标识颜色', width:150,templet:'<div><div style="background-color:{{d.color}}">{{d.color}}</div></div>'}
+			,{field: 'reward_max', title: '每日打赏限额', width:130, sort: true}
+			,{field: 'permission', title: '权限', width:120,templet:'#permission'}
+			,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:150}
+		]]
+	});
+	
+	form.on('submit(user-search)', function(data){
+		var field = data.field;
+		
+		table.reload('list', {
+			where: field
+		});
+	});
+	
+	table.on('toolbar(list)', function(obj){
+		var checkStatus = table.checkStatus(obj.config.id);
+		var data = checkStatus.data;
+		switch(obj.event){
+			case 'create':
+				var getTpl = $('#edit').html();
+				laytpl(getTpl).render({permission:{}}, function(html) {
+					var index = layer.open({
+						type: 1,
+						area: ['100%','100%'],
+						content: html
+					});
+					form.render('checkbox');
+					
+					colorpicker.render({
+						elem:'#edit-font-color',
+						color:data.font_color,
+						change:function (color) {
+							$('#font-color').val(color);
+						}
+					});
+					
+					colorpicker.render({
+						elem:'#edit-color',
+						color:data.color,
+						change:function (color) {
+							$('#color').val(color);
+						}
+					});
+					
+					form.on('submit(edit)',function(form) {
+						$.post('<{url('usergroup','edit_or_create_ajax','create')}>',Object.assign(form.field),function(data) {
+							if(data.status) {
+								layer.msg(data.msg,{icon:6});
+								table.reload('list');
+								layer.close(index);
+							} else {
+								layer.alert(data.msg,{icon:5});
+							}
+						});
+						return false;
+					});
+				});
+				break;
+		};
+	});
+
+	table.on('tool(list)', function(obj) {
+		var data = obj.data;
+		var event = obj.event;
+		var tr = obj.tr;
+		
+		if(event == 'edit') {
+			var getTpl = $('#edit').html();
+			laytpl(getTpl).render(data, function(html) {
+				var index = layer.open({
+					type: 1,
+					area: ['100%','100%'],
+					content: html
+				});
+				form.render('checkbox');
+				
+				colorpicker.render({
+					elem:'#edit-font-color',
+					color:data.font_color,
+					change:function (color) {
+						$('#font-color').val(color);
+					}
+				});
+				
+				colorpicker.render({
+					elem:'#edit-color',
+					color:data.color,
+					change:function (color) {
+						$('#color').val(color);
+					}
+				});
+				
+				form.on('submit(edit)',function(form) {
+					$.post('<{url('usergroup','edit_or_create_ajax','edit')}>',Object.assign({gid:data.gid},form.field),function(data) {
+						if(data.status) {
+							layer.msg(data.msg,{icon:6});
+							table.reload('list');
+							layer.close(index);
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					return false;
+				});
+			});
+		} else if(event == 'delete') {
+			layer.alert('确定要删除吗？删除后将无法恢复',{
+				icon: 0,
+				title: '删除用户组',
+				yes: function(index) {
+					$.get("<{url('usergroup','delete_ajax','"+data.gid+"')}>",function(data) {
+						if(data.status) {
+							layer.msg('删除成功',{icon:6});
+							table.reload('list');
+						} else {
+							layer.alert(data.msg,{icon:5});
+						}
+					});
+					layer.close(index);
+				}
+			});
+		}
+	});
+});
+</script>
+
+<{include file="../include/footer.html"}>

@@ -1,0 +1,114 @@
+<{include file = '../include/header.html'}>
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item active"><{$forum.name}></li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="media border p-3">
+		<img src="<{$forum.icon}>" alt="版块图标" class="mr-3 rounded" style="width:60px;">
+		<div class="media-body">
+			<h4><{$forum.name}></h4>
+			<span class="float-right">
+				<a href="<{url('thread','create',$p_0)}>"><button class="btn btn-info"><i class="fa fa-pencil-square-o"></i> 发表主题</button></a>
+			</span>
+			<p>
+				<b>热度</b> <{$forum.hot}>&nbsp;&nbsp;
+				<b>话题</b> <{$forum.threads}>
+			</p>
+			<p>
+				<{($forum.description) ? $forum.description : '这个版块没有描述'}>
+			</p>
+			<hr>
+			<div>
+				<h5>版主</h5>
+				<{foreach from = $forum.moderators item = $user}>
+				<a href="<{url('user','index',$user.uid)}>" data-toggle="tooltip" title="<{$user.username}>"><img src="<{$user.avatar}>" class="mr-3 border rounded-circle" width="50px"></a>
+				<{/foreach}>
+			</div>
+			<hr>
+			<div>
+				<h5>版规</h5>
+				<div id="rule" class="collapse"><{$forum.rule}></div>
+				<a href="#rule" data-toggle="collapse">展开/收起</a>
+			</div>
+		</div>
+	</div>
+	<div class="mt-3">
+		<table class="table table-sm thread-list">
+			<thead class="thead-light">
+				<tr>
+					<th width="5%"></th>
+					<th width="50%" class="crumbs">
+						<a href="<{url('forum','index',$p_0,0,$p_2)}>">最新回复</a>
+						<a href="<{url('forum','index',$p_0,1,$p_2)}>">最新发布</a>
+						<a href="<{url('forum','index',$p_0,2,$p_2)}>">浏览最多</a>
+						<a href="<{url('forum','index',$p_0,3,$p_2)}>">评论最多</a>
+						<a href="<{url('forum','index',$p_0,4,$p_2)}>">点赞最多</a>
+						<a href="<{url('forum','index',$p_0,5,$p_2)}>">精华</a>
+					</th>
+					<th width="20%">作者</th>
+					<th width="15%">评论/浏览</th>
+					<th width="10%">点赞</th>
+				</tr>
+			</thead>
+			<tbody>
+				<{foreach from = $threads item = $thread}>
+				<tr>
+					<td class="thread-list-common">
+						<{if $thread.top == 0}>
+						<span class="badge badge-primary">主题</span>
+						<{else if $thread.top == 1}>
+						<span class="badge badge-secondary">置顶</span>
+						<{else if $thread.top == 2}>
+						<span class="badge badge-dark">公告</span>
+						<{/if}>
+					</td>
+					<td class="thread-list-common">
+						<{if $thread.points}>
+						<span class="badge badge-danger"><{number($thread.points)}></span>
+						<{/if}>
+						<{if time() - $thread.time <= 12 * 60 * 60}>
+						<span class="badge badge-success">最新</span>
+						<{/if}>
+						<{if $thread.comments >= 200}>
+						<span class="badge badge-danger">热门</span>
+						<{/if}>
+						<{if $thread.essence}>
+						<span class="badge badge-warning text-light">精华</span>
+						<{/if}>
+						<{if $thread.lock}>
+						<span class="badge badge-info">锁定</span>
+						<{/if}>
+						<a href="<{url('thread','index',$thread.tid,0,0,1)}>" class="text-dark"><{$thread.title}></a>
+					</td>
+					<td>
+						<a href="<{url('user','index',$thread.user.uid)}>" color="<{$thread.user.group.font_color}>"><{$thread.user.username}></a><br>
+						<span class="text-muted"><{timeFormat($thread.time)}></span>
+					</td>
+					<td>
+						<span class="text-primary"><{$thread.comments}></span> /
+						<{$thread.views}>
+					</td>
+					<td>
+						<{$thread.praises}>
+					</td>
+				</tr>
+				<{/foreach}>
+			</tbody>
+		</table>
+		<div>
+			<{pagination($forum.threads,30,$p_2,url('forum','index',$p_0,$p_1,'{{page}}'))}>
+		</div>
+	</div>
+</div>
+
+<script>
+$(document).ready(function(){
+	$('[data-toggle="tooltip"]').tooltip(); 
+});
+</script>
+
+<{include file = '../include/footer.html'}>

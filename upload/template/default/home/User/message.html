@@ -1,0 +1,71 @@
+<{include file = "../include/header.html"}>
+
+<link rel="stylesheet" href="<{URL}>static/css/user.css">
+
+<div class="layout-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="<{url('index','index')}>">首页</a></li>
+		<li class="breadcrumb-item active">消息中心</li>
+	</ol>
+</div>
+<div class="layout-container">
+	<div class="row">
+		<div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 left">
+			<ul class="navbar-nav tab">
+				<li id="0" href="<{url('user','message',0,1)}>"><i class="fa fa-commenting-o"></i> 主题回复 <{if $unread.0}><span class="badge badge-pill badge-danger"><{($unread.0 > 99) ? '99+' : $unread.0}></span><{/if}></li>
+				<li id="2" href="<{url('user','message',2,1)}>"><i class="fa fa fa-thumbs-o-up"></i> 主题点赞 <{if $unread.2}><span class="badge badge-pill badge-danger"><{($unread.2 > 99) ? '99+' : $unread.2}></span><{/if}></li>
+				<li id="3" href="<{url('user','message',3,1)}>"><i class="fa fa-map-o"></i> 主题打赏 <{if $unread.3}><span class="badge badge-pill badge-danger"><{($unread.3 > 99) ? '99+' : $unread.3}></span><{/if}></li>
+				<li id="1" href="<{url('user','message',1,1)}>"><i class="fa fa-bell-o"></i> 系统消息 <{if $unread.1}><span class="badge badge-pill badge-danger"><{($unread.1 > 99) ? '99+' : $unread.1}></span><{/if}></li>
+			</ul>
+		</div>
+		<div class="col-sm-10 col-md-10 col-lg-10 col-xl-10 right">
+			<ul class="list-group list-group-flush">
+				<{foreach from = $messages item = $message}>
+				<li class="list-group-item">
+					<div class="media pt-3">
+						<a href="<{url('user','index',$message.user.uid)}>"><img src="<{$message.user.avatar}>" class="mr-3 rounded-circle" style="width:50px;"></a>
+						<div class="media-body">
+							<h6 color="<{$message.user.group.font_color}>">
+								<{$message.user.username}>
+								<{if ! $message.isread}>
+								<span class="badge badge-pill badge-primary float-right">未读</span>
+								<{/if}>
+							</h6>
+							<p>
+								<span class="badge text-white" bgcolor="<{$message.user.group.color}>">
+									<{$message.user.group.name}>
+								</span>
+								<span class="float-right text-muted"><{timeFormat($message.time)}></span>
+							</p>
+							
+							<{if $p_0 == 0}>
+							<p class="content"><{content($message.content)}><div class="comment-quote">主题：<a href="<{url('thread','index',$message.tid,0,0,1)}>"><{$message.thread.title}></a></div></p>
+							<{else if $p_0 == 1}>
+							<p class="content"><{content($message.content)}></p>
+							<{else if $p_0 == 2}>
+							<p class="content">点赞了主题 《<a href="<{url('thread','index',$message.tid,0,0,1)}>"><{$message.thread.title}></a>》</p>
+							<{else if $p_0 == 3}>
+							<p class="content">打赏了主题 《<a href="<{url('thread','index',$message.tid,0,0,1)}>"><{$message.thread.title}></a>》 <span color="<{($message.content2 > 0) ? 'green' : 'red'}>"><{number($message.content2)}></span> <{C('point_name')}>，理由：<br><{$message.content}></p>
+							<{/if}>
+						</div>
+					</div>
+				</li>
+				<{foreachelse}>
+				<p class="text-center text-muted mt-5 mb-5">空空如也～</p>
+				<{/foreach}>
+			</ul>
+			<div class="pt-3">
+				<{pagination($count,30,$p_1,url('user','message',$p_0,'{{page}}'))}>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$('.tab #<{$p_0}>').addClass('active');
+$('.tab li').click(function() {
+	location.href = $(this).attr('href');
+});
+</script>
+
+<{include file = "../include/footer.html"}>

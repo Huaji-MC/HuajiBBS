@@ -1,0 +1,181 @@
+.logo {
+	background-color: rgba(255,255,255,.9);
+	border-radius: 5px;
+}
+
+.search>input {
+	border-right: none;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.search>button {
+	border: 1px solid #ced4da;
+	border-left: none;
+	border-radius: .25rem;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	background-color: #fff;
+	color: #495057;
+}
+
+.breadcrumb {
+	background-color: rgba(0,0,0,.0);
+}
+.breadcrumb-item>a,.breadcrumb-item>a:hover {
+	color: #606461;
+}
+.breadcrumb-item.active {
+	color: #585960;
+	font-weight: bold;
+}
+.breadcrumb-item.active:before {
+	color: #606461;
+	font-weight: normal;
+}
+
+.alert {
+	box-shadow: -2px 1px 20px #AAAAAA;
+	color: white;
+	border: none;
+}
+.alert-success {
+	background-color: #40c967;
+}
+.alert-danger {
+	background-color: #ef4444;
+}
+.alert-warning {
+	background-color: #fbbf24;
+}
+
+.table-gray {
+	background-color: #fafafa
+}
+.table td {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.ellipsis-1 {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.ellipsis-2 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+.ellipsis-3 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+body {
+	background-color: #f5f7f9;
+}
+.layout {
+	padding: 15px;
+	padding-top: 80px;
+}
+.layout-tips {
+	width: 40%;
+	position: fixed;
+	z-index: 10000;
+	top: 80px;
+	right: 0;
+	padding: 20px;
+}
+.layout-container {
+	background-color: #fff;
+	padding: 10px;
+	color: #636470;
+	min-height: 150px;
+	border-radius: 5px;
+	line-height: 1.5;
+}
+.layout-footer {
+	padding: 30px;
+	text-align: center;
+	color: #808998;
+}
+.layout-table {
+	border: none;
+}
+
+.forum-list>li {
+	padding: 8px;
+}
+.forum-list h2 {
+	font-size: 16px;
+	line-height: 16px;
+	font-weight: bold;
+}
+.forum-list h2>a {
+	color: #686868;
+}
+
+.form-control-normal {
+	display: inline;
+	width: 150px;
+	height: 32px;
+	font-size: 15px;
+}
+
+.thread-list>tbody {
+	font-size: 12px;
+}
+.thread-list th {
+	font-weight: normal;
+}
+.thread-list-common {
+	font-size: 15px;
+}
+
+.comment-quote {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid #cecece;
+	background-color: #eeeeee;
+	padding: 5px;
+	margin: 3px;
+}
+
+.btn-file {
+	display: none;
+}
+
+.content {
+	margin: 0;
+	line-height: 38px;
+}
+
+.red-dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: #FF5722;
+}
+
+blockquote {
+	border-left: 5px solid #DDDDDD;
+	padding: 15px;
+	background-color: #fafafa;
+}
+
+.content pre code {
+	white-space: pre;
+	padding: 10px;
+	border-radius: 6px;
+	line-height: normal;
+	white-space: pre !important;
+	overflow-x: scroll !important;
+	word-break: keep-all !important;
+	word-wrap: initial !important;
+}

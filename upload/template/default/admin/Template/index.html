@@ -1,0 +1,107 @@
+<{include file="../include/header.html"}>
+
+<style>
+.template-info {flex-flow:column;display:flex;position:absolute;bottom:0;right:0;top:0;padding:20px;}
+.template-btn {position: absolute;bottom:20px;right:20px;}
+</style>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			请将模板压缩包解压到 /template 目录以加载，具体内容可在 <a href="http://huajimc.gitee.io/HuajiBBS" class="layui-font-blue">HuajiBBS 官网</a> 查找
+		</div>
+	</div>
+	<div class="layui-fluid layadmin-maillist-fluid">
+		<{foreach from = $templates item = $template}>
+		<div class="layui-row layui-col-space15">
+			<div class="layui-col-md6 layui-col-sm12">
+				<div class="layadmin-contact-box">
+					<div class="layui-col-md4 layui-col-sm5">
+						<div class="layadmin-text-center">
+							<{if $template.preview}>
+							<img src="<{$template.preview}>" style="border-radius:5px;">
+							<{else}>
+							<img class="layui-icon layui-icon-template-2">
+							<{/if}>
+							<div class="layadmin-maillist-img layadmin-font-blod">
+								<p>预览图</p>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md8 layadmin-padding-left20 layui-col-sm7 template-info">
+						<h3 class="layadmin-title"><strong><{$template.data.name}></strong></h3>
+						<div class="layadmin-address">
+							<p>描述：<{$template.data.description}></p>
+							<p>版权：<{$template.data.copyright}></p>
+							<p>模板目录：/template/<{$template.dir}></p>
+							<p>
+								兼容版本：
+								<{assign var = 'check' value = 0}>
+								<{foreach from = $template.data.version item = $version}>
+								<span class="layui-badge layui-bg-blue">V<{$version}></span>
+								<{if $version == VERSION}><{assign var = 'check' value = 1}><{/if}>
+								<{/foreach}>
+								<{if ! $check}>
+								<p class="layui-font-red">此模板可能不兼容你的 HuajiBBS 版本，建议更换兼容的模板</p>
+								<{/if}>
+							</p>
+						</div>
+						<div class="template-btn">
+							<{if $template.dir == C('current_template')}>
+							<button class="layui-btn layui-btn-sm layui-btn-disabled"><i class="layui-icon layui-icon-templeate-1"></i>已启用</button>
+							<{else}>
+							<button class="layui-btn layui-btn-sm" data-dir="<{$template.dir}>" HuajiBBS-action="use"><i class="layui-icon layui-icon-templeate-1"></i>切换</button>
+							<{/if}>
+							<button class="layui-btn layui-btn-danger layui-btn-sm" data-dir="<{$template.dir}>" HuajiBBS-action="delete"><i class="layui-icon layui-icon-delete"></i>删除</button>
+							<button class="layui-btn layui-btn-normal layui-btn-sm" data-dir="<{$template.dir}>" HuajiBBS-action="copy"><i class="layui-icon layui-icon-export"></i>复制</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<{/foreach}>
+	</div>
+</div>
+
+<script>
+layui.use('util',function() {
+	var util = layui.util;
+	
+	util.event('HuajiBBS-action',{
+		use: function(othis) {
+			$.post('<{url('template','action_ajax','use')}>',{dir:othis.data('dir')},function(data) {
+				if(data.status) {
+					location.reload();
+				} else {
+					layer.alert(data.msg,{icon:5});
+				}
+			});
+		},
+		delete: function(othis) {
+			layer.alert('确定要删除吗？删除后将无法恢复',{
+				icon: 7,
+				yes:function() {
+        			$.post('<{url('template','action_ajax','delete')}>',{dir:othis.data('dir')},function(data) {
+        				if(data.status) {
+        					location.reload();
+        				} else {
+        					layer.alert(data.msg,{icon:5});
+        				}
+        			});
+				}
+			});
+		},
+		copy: function(othis) {
+			$.post('<{url('template','action_ajax','copy')}>',{dir:othis.data('dir')},function(data) {
+				if(data.status) {
+					location.reload();
+				} else {
+					layer.alert(data.msg,{icon:5});
+				}
+			});
+		}
+	});
+});
+</script>
+
+<{include file="../include/footer.html"}>

@@ -1,0 +1,12 @@
+		</div>
+	</div>
+</div>
+
+<script>
+$('.tab #<{$show}>').addClass('active');
+$('.tab li').click(function() {
+	location.href = $(this).attr('href');
+});
+</script>
+
+<{include file = "../include/footer.html"}>

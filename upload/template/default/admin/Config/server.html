@@ -1,0 +1,87 @@
+<{include file='../include/header.html'}>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			<table class="layui-table">
+				<colgroup>
+					<col width="20%">
+					<col width="80%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>项目</th>
+						<th>信息</th>
+					</tr> 
+				</thead>
+				<tbody>
+					<tr>
+						<td>论坛版本</td>
+						<td><{VERSION}></td>
+					</tr>
+					<tr>
+						<td>缓存</td>
+						<td>
+							<{$cache}>
+							<button class="layui-btn layui-btn-normal layui-btn-xs" id="clear-cache">清除</button>
+						</td>
+					</tr>
+					<tr>
+						<td>服务器IP</td>
+						<td><{gethostbyname($smarty.server.SERVER_NAME)}></td>
+					</tr>
+					<tr>
+						<td>服务器信息</td>
+						<td><{php_uname()}></td>
+					</tr>
+					<tr>
+						<td>服务器系统</td>
+						<td><{php_uname('s')}></td>
+					</tr>
+					<tr>
+						<td>Web服务器</td>
+						<td><{$smarty.server.SERVER_SOFTWARE}></td>
+					</tr>
+					<tr>
+						<td>网站根目录</td>
+						<td><{ROOT_PATH}></td>
+					</tr>
+					<tr>
+						<td>论坛首页</td>
+						<td><{URL}></td>
+					</tr>
+					<tr>
+						<td>服务器语言</td>
+						<td><{$smarty.server.HTTP_ACCEPT_LANGUAGE}></td>
+					</tr>
+					<tr>
+						<td>PHP版本</td>
+						<td><{PHP_VERSION}></td>
+					</tr>
+					<tr>
+						<td>PHP支持模块</td>
+						<td style="line-height:28px">
+							<{foreach from = get_loaded_extensions() item = $name}>
+							<span class="layui-badge layui-bg-blue"><{$name}></span>
+							<{/foreach}>
+						</td>
+					</tr>
+					<tr>
+						<td>你的IP</td>
+						<td><{ip()}></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+$('#clear-cache').click(function() {
+	$.get('<{url('config','clear_cache')}>',function(data) {
+		layer.alert('清除成功',{icon:6,yes:function() {location.reload();}});
+	});
+});
+</script>
+
+<{include file='../include/footer.html'}>

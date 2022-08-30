@@ -1,0 +1,64 @@
+<{include file = '../include/user_header.html'}>
+
+<table class="table table-sm thread-list">
+	<thead class="thead-light">
+		<tr>
+			<th width="5%"></th>
+			<th width="50%">标题</th>
+			<th width="20%">作者</th>
+			<th width="15%">评论/浏览</th>
+			<th width="10%">点赞</th>
+		</tr>
+	</thead>
+	<tbody>
+		<{foreach from = $threads item = $thread}>
+		<tr>
+			<td class="thread-list-common">
+				<{if $thread.top == 0}>
+				<span class="badge badge-primary">主题</span>
+				<{else if $thread.top == 1}>
+				<span class="badge badge-secondary">置顶</span>
+				<{else if $thread.top == 2}>
+				<span class="badge badge-dark">公告</span>
+				<{/if}>
+			</td>
+			<td class="thread-list-common">
+				<{if $thread.points}>
+				<span class="badge badge-danger"><{number($thread.points)}></span>
+				<{/if}>
+				<{if time() - $thread.time <= 12 * 60 * 60}>
+				<span class="badge badge-success">最新</span>
+				<{/if}>
+				<{if $thread.comments >= 200}>
+				<span class="badge badge-danger">热门</span>
+				<{/if}>
+				<{if $thread.essence}>
+				<span class="badge badge-warning text-light">精华</span>
+				<{/if}>
+				<{if $thread.lock}>
+				<span class="badge badge-info">锁定</span>
+				<{/if}>
+				<a href="<{url('thread','index',$thread.tid,0,0,1)}>" class="text-dark"><{$thread.title}></a>
+			</td>
+			<td>
+				<a href="<{url('user','index',$thread.user.uid)}>" color="<{$thread.user.group.font_color}>"><{$thread.user.username}></a><br>
+				<span class="text-muted"><{timeFormat($thread.time)}></span>
+			</td>
+			<td>
+				<span class="text-primary"><{$thread.comments}></span> /
+				<{$thread.views}>
+			</td>
+			<td>
+				<{$thread.praises}>
+			</td>
+		</tr>
+		<{foreachelse}>
+		<p class="text-center text-muted mt-5 mb-5">空空如也～</p>
+		<{/foreach}>
+	</tbody>
+</table>
+<div>
+	<{pagination($user.threads,30,$p_1,url('user','threads',$p_0,'{{page}}'))}>
+</div>
+
+<{include file = '../include/user_footer.html'}>
