@@ -5,10 +5,11 @@
 ### 一、简介
 
 HuajiBBS 是由 滑稽MC 开发的一款 PHP 论坛系统，HuajiBBS致力于为用户提供最优质的服务！
+官网链接：[HuajiBBS官网](https://HuajiMC.gitee.io/HuajiBBS)
 
 ### 二、下载安装包
 
-你可以在 https://gitee.com/huajimc/HuajiBBS/releases 下载对应版本安装包
+你可以在 https://github.com/Huaji-MC/HuajiBBS/releases/ 下载对应版本安装包
 
 ### 三、安装方法
 
@@ -23,7 +24,7 @@ HuajiBBS 是由 滑稽MC 开发的一款 PHP 论坛系统，HuajiBBS致力于为
 
 ### 五、讨论交流
 
-https://gitee.com/huajimc/HuajiBBS/issues
+https://github.com/Huaji-MC/HuajiBBS/issues
 
 ### 六、QQ交流群
 
