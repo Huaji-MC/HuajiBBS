@@ -31,4 +31,4 @@ https://gitee.com/huajimc/HuajiBBS/issues
 
 ### 六、赞助我们
 
-![赞助二维码](./reward.png)
+![赞助二维码](https://gitee.com/huajimc/HuajiBBS/raw/master/reward.png)
