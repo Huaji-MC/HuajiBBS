@@ -27,7 +27,7 @@ https://gitee.com/huajimc/HuajiBBS/issues
 
 ### 六、QQ交流群
 
-![HuajiBBS交流群](./qq.png)
+![HuajiBBS交流群](https://gitee.com/huajimc/HuajiBBS/raw/master/qq.png)
 
 ### 六、赞助我们
 
